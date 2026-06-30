@@ -435,7 +435,7 @@ async function chargerEtat() {
     const e = await appelJson('/api/etat');
     const items = [
       ['worker', 'Worker'], ['base_donnees', 'Base de données'], ['stockage_audio', 'Stockage audio'],
-      ['telephonie_plivo', 'Téléphonie (Plivo)'], ['ia_groq', 'IA (Groq)'], ['url_base_configuree', 'URL de base (cron)'],
+      ['telephonie_telnyx', 'Téléphonie (Telnyx)'], ['ia_groq', 'IA (Groq)'], ['url_base_configuree', 'URL de base (cron)'],
     ];
     if ('voix_elevenlabs' in e) items.push(['voix_elevenlabs', 'Voix (ElevenLabs)']);
     document.getElementById('etatBar').innerHTML = items.map(([k, libelle]) => `<span class="puce ${e[k] ? 'ok' : 'off'}">${libelle}</span>`).join('');
