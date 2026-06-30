@@ -100,6 +100,8 @@
 
   /* Cartes Notes façon "Modifié + Sauvegarder/Supprimer" */
   .carte-note { background: var(--panel2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 14px; }
+  .carte-note .note-titre-edit { background: transparent; border: none; border-bottom: 1px dashed var(--border); color: #ff7fd0; font-weight: 800; font-size: 14px; width: 100%; margin-bottom: 8px; padding: 2px 0; }
+  .carte-note .note-titre-edit:focus { outline: none; border-bottom-color: var(--rose); }
   .carte-note .note-rendu { font-size: 14px; line-height: 1.6; margin-bottom: 10px; }
   .carte-note .note-rendu a { color: var(--cyan); text-decoration: underline; }
   .carte-note textarea.note-edit { background: transparent; border: 1px dashed var(--border); margin-bottom: 10px; }
@@ -113,19 +115,17 @@
   .btn-supprimer { background: #3a1620; border: 1px solid #ff4d6d; color: #ff8fa3; }
   .btn-supprimer:active { background: #511a26; }
 
-  /* Cartes Liens façon icône + domaine centrés */
-  .grille-liens { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .carte-lien { background: var(--panel2); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
-  .carte-lien .titre-lien { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
-  .carte-lien .titre-lien input { background: transparent; border: none; padding: 2px 0; font-weight: 800; font-size: 14px; color: #ff7fd0; }
-  .carte-lien .ouverture-lien {
-    display: flex; flex-direction: column; align-items: center; gap: 6px; text-decoration: none;
-    background: #15171b; border: 1px solid var(--border); border-radius: 8px; padding: 18px 8px; margin-bottom: 8px;
-  }
-  .carte-lien .ouverture-lien .icone-lien { font-size: 22px; }
-  .carte-lien .ouverture-lien .domaine-lien { font-size: 12px; color: var(--cyan); word-break: break-all; text-align: center; }
-  .carte-lien input.url-edit { font-size: 11px; margin-bottom: 8px; }
-  @media (max-width: 480px) { .grille-liens { grid-template-columns: 1fr; } }
+  /* Liens — style compact : une ligne par lien */
+  .lien-ligne { display: flex; align-items: center; gap: 8px; background: var(--panel2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; }
+  .lien-ligne a.lien-ouvrir { color: var(--turquoise); font-size: 13px; font-weight: 700; text-decoration: none; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lien-ligne a.lien-ouvrir:hover { text-decoration: underline; }
+  .lien-ligne .lien-domaine { font-size: 10px; color: var(--texte-dim); flex: 0 0 auto; }
+  .lien-ligne .lien-actions { display: flex; gap: 4px; flex: 0 0 auto; }
+  .lien-ligne button.small { margin: 0; }
+  /* Formulaire d'édition inline d'un lien (masqué par défaut) */
+  .lien-edit-form { background: var(--panel2); border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin-bottom: 6px; display: none; }
+  .lien-edit-form.visible { display: block; }
+  .grille-liens { display: block; } /* gardé pour compatibilité JS existant */
   .note-meta { font-size: 10px; color: var(--texte-dim); margin-top: 6px; }
 
   .campagne-item { background: var(--panel2); border-radius: 8px; padding: 12px; margin-bottom: 8px; border-left: 3px solid var(--cyan); }
@@ -162,7 +162,6 @@
     <span class="titre-app">PGI • Phoning Center Pro</span>
     <span id="horloge" class="hint" style="margin:0;"></span>
   </div>
-  <div class="hint" style="margin:0;">Interface v3.2 — si tu ne vois pas cette version après une mise à jour, vide le cache de ton navigateur.</div>
   <div class="etat-bar" id="etatBar"><span class="puce">Worker : config requise</span></div>
 </header>
 
@@ -391,29 +390,38 @@ function cfg() {
     key: document.getElementById('apiKey').value || localStorage.getItem('pgi_api_key') || '',
   };
 }
+function cfgOk() {
+  const { url, key } = cfg();
+  return !!url && !!key;
+}
 async function sauverConfig() {
-  localStorage.setItem('pgi_worker_url', document.getElementById('workerUrl').value);
-  localStorage.setItem('pgi_api_key', document.getElementById('apiKey').value);
+  localStorage.setItem('pgi_worker_url', document.getElementById('workerUrl').value.trim());
+  localStorage.setItem('pgi_api_key', document.getElementById('apiKey').value.trim());
   await chargerEtat();
   chargerCampagnes();
-  alert('Configuration enregistrée.');
+  alert('Configuration enregistrée ✓');
 }
 
 window.addEventListener('load', () => {
-  document.getElementById('workerUrl').value = localStorage.getItem('pgi_worker_url') || '';
-  document.getElementById('apiKey').value = localStorage.getItem('pgi_api_key') || '';
+  // Charger silencieusement depuis localStorage — pas de re-demande si déjà renseigné
+  const urlStocke = localStorage.getItem('pgi_worker_url') || '';
+  const keyStocke = localStorage.getItem('pgi_api_key')   || '';
+  document.getElementById('workerUrl').value = urlStocke;
+  document.getElementById('apiKey').value    = keyStocke;
   ajouterLigneCreneau();
-  chargerEtat();
-  chargerCampagnes();
+  if (urlStocke && keyStocke) {
+    chargerEtat();
+    chargerCampagnes();
+  }
   setInterval(majHorloge, 1000);
-  setInterval(chargerEtat, 60000);
+  setInterval(() => { if (cfgOk()) chargerEtat(); }, 60000);
   majHorloge();
 });
 function majHorloge() { document.getElementById('horloge').textContent = new Date().toLocaleString('fr-FR', { timeZone: 'Europe/Paris' }); }
 
 async function appel(chemin, options = {}) {
   const { url, key } = cfg();
-  if (!url || !key) { alert("Configure d'abord l'URL du Worker et la clé API (onglet Config)."); throw new Error('config manquante'); }
+  if (!url || !key) { alert("Configure l'URL du Worker et la clé API dans l'onglet ⚙️ Config."); throw new Error('config manquante'); }
   const sep = chemin.includes('?') ? '&' : '?';
   const res = await fetch(url + chemin + sep + 'key=' + encodeURIComponent(key), { ...options, headers: { 'content-type': 'application/json', 'x-api-key': key, ...(options.headers || {}) } });
   if (!res.ok) throw new Error(await res.text());
@@ -626,6 +634,7 @@ function fermerModal() { document.getElementById('modalAppel').classList.remove(
 // ---------- Notes ----------
 function echapperHtml(s) { return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 function linkify(texte) { return texte.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>'); }
+
 async function ajouterNote() {
   const champ = document.getElementById('nouvelleNote');
   const texte = champ.value.trim();
@@ -636,12 +645,22 @@ async function ajouterNote() {
     chargerNotes();
   } catch (e) { alert('Erreur lors de l\'ajout : ' + e.message); }
 }
+
 async function chargerNotes() {
   const notes = await appelJson('/api/notes');
-  document.getElementById('listeNotes').innerHTML = notes.map(n => `
+  // Le titre est stocké dans la 1ère ligne du texte si elle commence par "# "
+  // sinon on affiche juste "(sans titre)" modifiable.
+  document.getElementById('listeNotes').innerHTML = notes.map(n => {
+    const lignes = n.texte.split('\n');
+    const aTitre = lignes[0].startsWith('# ');
+    const titre   = aTitre ? lignes[0].slice(2).trim() : '';
+    const corps   = aTitre ? lignes.slice(1).join('\n').trim() : n.texte;
+    return `
     <div class="carte-note">
-      <div class="note-rendu">${linkify(echapperHtml(n.texte))}</div>
-      <textarea class="note-edit" id="note-edit-${n.id}" rows="3">${echapperHtml(n.texte)}</textarea>
+      <input class="note-titre-edit" id="note-titre-${n.id}"
+             value="${echapperHtml(titre)}" placeholder="Titre de la note (optionnel)" />
+      <div class="note-rendu">${linkify(echapperHtml(corps))}</div>
+      <textarea class="note-edit" id="note-edit-${n.id}" rows="3">${echapperHtml(corps)}</textarea>
       <hr />
       <div class="pied-carte">
         <span class="date-maj">Modifié ${n.updated_at}${n.updated_at === n.created_at ? '' : `<br/>Créée ${n.created_at}`}</span>
@@ -650,12 +669,16 @@ async function chargerNotes() {
           <button class="btn-supprimer" onclick="supprimerNote(${n.id})">Supprimer</button>
         </div>
       </div>
-    </div>`).join('') || '<p class="hint">Aucune note pour l\'instant.</p>';
+    </div>`;
+  }).join('') || '<p class="hint">Aucune note pour l\'instant.</p>';
 }
+
 async function enregistrerNote(id) {
-  const champ = document.getElementById(`note-edit-${id}`);
-  const texte = champ.value.trim();
-  if (!texte) return alert('La note ne peut pas être vide.');
+  const titre = (document.getElementById(`note-titre-${id}`)?.value || '').trim();
+  const corps = (document.getElementById(`note-edit-${id}`)?.value || '').trim();
+  if (!corps) return alert('Le contenu de la note ne peut pas être vide.');
+  // Stockage : "# Titre\nCorps" si titre présent, sinon juste le corps
+  const texte = titre ? `# ${titre}\n${corps}` : corps;
   try {
     await appelJson(`/api/notes/${id}`, { method: 'PUT', body: JSON.stringify({ texte }) });
     chargerNotes();
@@ -666,43 +689,57 @@ async function supprimerNote(id) {
   catch (e) { alert('Erreur : ' + e.message); }
 }
 
-// ---------- Liens ----------
-function extraireDomaine(url) {
-  try { return new URL(url).hostname.replace(/^www\./, ''); } catch { return url; }
+// ---------- Liens (compacts) ----------
+function extraireDomaine(u) {
+  try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return u; }
 }
+
 async function ajouterLien() {
-  const libelle = document.getElementById('nouveauLienLibelle').value.trim();
+  const libelle  = document.getElementById('nouveauLienLibelle').value.trim();
   const lien_url = document.getElementById('nouveauLienUrl').value.trim();
   if (!lien_url) return alert('Renseigne une URL avant de cliquer sur Ajouter.');
   try {
     await appelJson('/api/liens', { method: 'POST', body: JSON.stringify({ libelle, lien_url }) });
     document.getElementById('nouveauLienLibelle').value = '';
-    document.getElementById('nouveauLienUrl').value = '';
+    document.getElementById('nouveauLienUrl').value     = '';
     chargerLiens();
   } catch (e) { alert("Erreur lors de l'ajout : " + e.message); }
 }
+
 async function chargerLiens() {
   const liens = await appelJson('/api/liens');
   document.getElementById('listeLiens').innerHTML = liens.map(l => `
-    <div class="carte-lien">
-      <div class="titre-lien">✎ <input id="lien-libelle-${l.id}" value="${echapperHtml(l.libelle || '')}" placeholder="Nom du lien" /></div>
-      <a class="ouverture-lien" href="${echapperHtml(l.url)}" target="_blank" rel="noopener">
-        <span class="icone-lien">🔗</span>
-        <span class="domaine-lien">${echapperHtml(extraireDomaine(l.url))}</span>
+    <div class="lien-ligne">
+      <a class="lien-ouvrir" href="${echapperHtml(l.url)}" target="_blank" rel="noopener"
+         title="${echapperHtml(l.url)}">
+        🔗 ${echapperHtml(l.libelle || extraireDomaine(l.url))}
       </a>
-      <input class="url-edit" id="lien-url-${l.id}" value="${echapperHtml(l.url)}" placeholder="https://..." />
-      <div class="pied-carte">
-        <span class="date-maj">Modifié ${l.updated_at}</span>
-        <div class="actions-carte">
-          <button class="btn-sauvegarder" onclick="enregistrerLien(${l.id})">💾 Sauvegarder</button>
-          <button class="btn-supprimer" onclick="supprimerLien(${l.id})">Supprimer</button>
-        </div>
+      <span class="lien-domaine">${echapperHtml(extraireDomaine(l.url))}</span>
+      <div class="lien-actions">
+        <button class="small secondaire" onclick="toggleEditLien(${l.id})">✎</button>
+        <button class="small danger" onclick="supprimerLien(${l.id})">✕</button>
+      </div>
+    </div>
+    <div class="lien-edit-form" id="lien-form-${l.id}">
+      <label>Libellé</label>
+      <input id="lien-libelle-${l.id}" value="${echapperHtml(l.libelle || '')}" placeholder="Nom affiché" />
+      <label>URL</label>
+      <input id="lien-url-${l.id}" value="${echapperHtml(l.url)}" placeholder="https://..." />
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button class="btn-sauvegarder small" style="width:auto;" onclick="enregistrerLien(${l.id})">💾 Sauvegarder</button>
+        <button class="secondaire small" onclick="toggleEditLien(${l.id})">Annuler</button>
       </div>
     </div>`).join('') || '<p class="hint">Aucun lien pour l\'instant.</p>';
 }
+
+function toggleEditLien(id) {
+  const f = document.getElementById(`lien-form-${id}`);
+  if (f) f.classList.toggle('visible');
+}
+
 async function enregistrerLien(id) {
-  const libelle = document.getElementById(`lien-libelle-${id}`).value.trim();
-  const lien_url = document.getElementById(`lien-url-${id}`).value.trim();
+  const libelle  = (document.getElementById(`lien-libelle-${id}`)?.value || '').trim();
+  const lien_url = (document.getElementById(`lien-url-${id}`)?.value || '').trim();
   if (!lien_url) return alert('URL requise.');
   try {
     await appelJson(`/api/liens/${id}`, { method: 'PUT', body: JSON.stringify({ libelle, lien_url }) });
