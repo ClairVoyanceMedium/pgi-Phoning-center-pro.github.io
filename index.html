@@ -4,6 +4,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
 <title>PGI • Phoning Center Pro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   :root {
@@ -23,9 +26,13 @@
     --ok: #2ee87a;
     --warn: #ffb02e;
     --err: #ff4d6d;
+    --font-main: 'Montserrat', sans-serif;
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--texte); font-family: 'Segoe UI', system-ui, sans-serif; padding-bottom: 70px; }
+  html, body, button, input, textarea, select, table, th, td, label, span, div, a, h1, h2, h3, h4, h5, h6, p {
+    font-family: var(--font-main);
+  }
+  body { margin: 0; background: var(--bg); color: var(--texte); padding-bottom: 70px; }
 
   header { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; position: sticky; top: 0; background: var(--bg); z-index: 6; }
   .titre-app {
@@ -168,7 +175,7 @@
 <main>
 
   <!-- CONFIG -->
-  <section class="vue active" id="vue-config">
+  <section class="vue" id="vue-config">
     <div class="panel c-cyan">
       <h2>Configuration Worker</h2>
       <label>URL du Worker</label>
@@ -217,7 +224,7 @@
   </section>
 
   <!-- CAMPAGNES -->
-  <section class="vue" id="vue-campagnes">
+  <section class="vue active" id="vue-campagnes">
     <div class="panel c-violet">
       <h2>Nouvelle campagne</h2>
       <label>Nom</label>
@@ -335,7 +342,7 @@
       <h2>Liens utiles</h2>
       <p class="hint">💡 Touche le nom pour le renommer, touche la carte (l'icône 🔗) pour ouvrir le lien. Aucune limite de nombre.</p>
       <label>Libellé (optionnel)</label>
-      <input id="nouveauLienLibelle" placeholder="Ex: Console Plivo" />
+      <input id="nouveauLienLibelle" placeholder="Ex: Console Telnyx" />
       <label>URL</label>
       <input id="nouveauLienUrl" placeholder="https://..." />
       <button style="border-color:var(--turquoise); color:var(--turquoise);" onclick="ajouterLien()">+ Ajouter un lien</button>
@@ -385,9 +392,14 @@ function changerVue(nom) {
 }
 
 function cfg() {
+  const urlBrute = document.getElementById('workerUrl').value.trim()
+    || localStorage.getItem('pgi_phoning_center_pro_workerUrl')
+    || '';
+  let url = urlBrute;
+  if (url && !url.startsWith('http://') && !url.startsWith('https://')) url = 'https://' + url;
   return {
-    url: (document.getElementById('workerUrl').value || localStorage.getItem('pgi_worker_url') || '').replace(/\/$/, ''),
-    key: document.getElementById('apiKey').value || localStorage.getItem('pgi_api_key') || '',
+    url: url.replace(/\/$/, ''),
+    key: document.getElementById('apiKey').value.trim() || localStorage.getItem('pgi_phoning_center_pro_apiKey') || '',
   };
 }
 function cfgOk() {
@@ -395,17 +407,39 @@ function cfgOk() {
   return !!url && !!key;
 }
 async function sauverConfig() {
-  localStorage.setItem('pgi_worker_url', document.getElementById('workerUrl').value.trim());
-  localStorage.setItem('pgi_api_key', document.getElementById('apiKey').value.trim());
+  let url = document.getElementById('workerUrl').value.trim();
+  const key = document.getElementById('apiKey').value.trim();
+  if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
+    url = 'https://' + url;
+    document.getElementById('workerUrl').value = url;
+  }
+  // Stockage 100% isolé avec préfixe pgi_phoning_center_pro_
+  localStorage.setItem('pgi_phoning_center_pro_workerUrl', url);
+  localStorage.setItem('pgi_phoning_center_pro_apiKey', key);
   await chargerEtat();
   chargerCampagnes();
   alert('Configuration enregistrée ✓');
 }
 
+// Migration unique depuis les anciennes clés courtes (pgi_worker_url, pgi_api_key)
+// vers les nouvelles clés préfixées isolées. Exécutée au chargement, une seule fois.
+(function migrerAncienLocalStorage() {
+  const migrations = [
+    ['pgi_worker_url', 'pgi_phoning_center_pro_workerUrl', v => v.includes('workers.dev') || v.startsWith('https://')],
+    ['pgi_api_key',    'pgi_phoning_center_pro_apiKey',    v => v.length > 8],
+  ];
+  for (const [ancienne, nouvelle, valide] of migrations) {
+    const ancVal = localStorage.getItem(ancienne);
+    if (ancVal && !localStorage.getItem(nouvelle) && valide(ancVal)) {
+      localStorage.setItem(nouvelle, ancVal);
+    }
+    localStorage.removeItem(ancienne); // supprimer l'ancienne clé dans tous les cas
+  }
+})();
+
 window.addEventListener('load', () => {
-  // Charger silencieusement depuis localStorage — pas de re-demande si déjà renseigné
-  const urlStocke = localStorage.getItem('pgi_worker_url') || '';
-  const keyStocke = localStorage.getItem('pgi_api_key')   || '';
+  const urlStocke = localStorage.getItem('pgi_phoning_center_pro_workerUrl') || '';
+  const keyStocke = localStorage.getItem('pgi_phoning_center_pro_apiKey')    || '';
   document.getElementById('workerUrl').value = urlStocke;
   document.getElementById('apiKey').value    = keyStocke;
   ajouterLigneCreneau();
