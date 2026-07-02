@@ -225,7 +225,7 @@
   </section>
 
   <!-- CAMPAGNES -->
-  <section class="vue active" id="vue-campagnes">
+  <section class="vue" id="vue-campagnes">
     <div class="panel c-violet">
       <h2>Nouvelle campagne</h2>
       <label>Nom</label>
@@ -309,7 +309,7 @@
   </section>
 
   <!-- DASHBOARD -->
-  <section class="vue" id="vue-dashboard">
+  <section class="vue active" id="vue-dashboard">
     <div class="panel c-vert">
       <h2>Vue d'ensemble (toutes campagnes)</h2>
       <div class="stats-grid" id="statsGlobales"></div>
@@ -365,9 +365,9 @@
 </main>
 
 <nav class="tabs">
-  <button onclick="changerVue('campagnes')" id="tab-campagnes" class="active"><span class="icone">📞</span>Campagnes</button>
+  <button onclick="changerVue('campagnes')" id="tab-campagnes"><span class="icone">📞</span>Campagnes</button>
   <button onclick="changerVue('listes')" id="tab-listes"><span class="icone">👥</span>Contacts</button>
-  <button onclick="changerVue('dashboard')" id="tab-dashboard"><span class="icone">📊</span>Bord</button>
+  <button onclick="changerVue('dashboard')" id="tab-dashboard" class="active"><span class="icone">📊</span>Board</button>
   <button onclick="changerVue('rapports')" id="tab-rapports"><span class="icone">📋</span>Rapports</button>
   <button onclick="changerVue('notes')" id="tab-notes"><span class="icone">📝</span>Notes</button>
   <button onclick="changerVue('liens')" id="tab-liens"><span class="icone">🔗</span>Liens</button>
