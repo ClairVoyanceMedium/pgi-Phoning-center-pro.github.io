@@ -29,10 +29,11 @@
     --font-main: 'Montserrat', sans-serif;
   }
   * { box-sizing: border-box; }
+  html { overscroll-behavior: none; }
   html, body, button, input, textarea, select, table, th, td, label, span, div, a, h1, h2, h3, h4, h5, h6, p {
     font-family: var(--font-main);
   }
-  body { margin: 0; background: var(--bg); color: var(--texte); padding-bottom: 70px; }
+  body { margin: 0; background: var(--bg); color: var(--texte); padding-bottom: 70px; overscroll-behavior: none; }
 
   header { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; position: sticky; top: 0; background: var(--bg); z-index: 6; }
   .titre-app {
@@ -99,8 +100,8 @@
 
   .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .stat { background: var(--panel2); border-radius: 8px; padding: 14px; text-align: center; border-top: 3px solid var(--border); }
-  .stat .valeur { font-size: 26px; font-weight: 800; }
-  .stat .libelle { font-size: 10px; color: var(--texte-dim); text-transform: uppercase; margin-top: 4px; }
+  .stat .valeur { font-size: 26px; font-weight: 500; }
+  .stat .libelle { font-size: 10px; color: var(--texte-dim); text-transform: uppercase; margin-top: 4px; letter-spacing: 0.5px; }
 
   .note-item { background: var(--panel2); border-radius: 6px; padding: 10px; margin-bottom: 8px; font-size: 13px; border-left: 3px solid var(--violet); }
   .note-item a { color: var(--cyan); text-decoration: underline; }
@@ -615,14 +616,16 @@ async function lancerCampagne(id, force) {
 // ---------- Dashboard ----------
 function rendreStats(conteneurId, s) {
   const tauxReponse = s.total ? Math.round((s.decroches / s.total) * 100) : 0;
+  // text-shadow néon fin : même couleur que le chiffre, halo léger
+  const neon = (hex) => `text-shadow: 0 0 8px ${hex}99, 0 0 18px ${hex}44`;
   document.getElementById(conteneurId).innerHTML = `
-    <div class="stat" style="border-top-color:var(--cyan)"><div class="valeur" style="color:var(--cyan)">${s.total || 0}</div><div class="libelle">Appels lancés</div></div>
-    <div class="stat" style="border-top-color:var(--vert)"><div class="valeur" style="color:var(--vert)">${s.decroches || 0}</div><div class="libelle">Décrochés</div></div>
-    <div class="stat" style="border-top-color:var(--orange)"><div class="valeur" style="color:var(--orange)">${s.sans_reponse || 0}</div><div class="libelle">Sans réponse</div></div>
-    <div class="stat" style="border-top-color:var(--err)"><div class="valeur" style="color:var(--err)">${s.echecs || 0}</div><div class="libelle">Échoués</div></div>
-    <div class="stat" style="border-top-color:var(--violet)"><div class="valeur" style="color:var(--violet)">${Math.round(s.duree_moyenne || 0)}s</div><div class="libelle">Durée moyenne</div></div>
-    <div class="stat" style="border-top-color:var(--jaune)"><div class="valeur" style="color:var(--jaune)">${s.rdv_pris || 0}</div><div class="libelle">RDV pris</div></div>
-    <div class="stat" style="border-top-color:var(--rose)"><div class="valeur" style="color:var(--rose)">${tauxReponse}%</div><div class="libelle">Taux de réponse</div></div>
+    <div class="stat" style="border-top-color:var(--cyan)"><div class="valeur" style="color:var(--cyan);${neon('#34c8ff')}">${s.total || 0}</div><div class="libelle">Appels lancés</div></div>
+    <div class="stat" style="border-top-color:var(--vert)"><div class="valeur" style="color:var(--vert);${neon('#2ee87a')}">${s.decroches || 0}</div><div class="libelle">Décrochés</div></div>
+    <div class="stat" style="border-top-color:var(--orange)"><div class="valeur" style="color:var(--orange);${neon('#ff9d3d')}">${s.sans_reponse || 0}</div><div class="libelle">Sans réponse</div></div>
+    <div class="stat" style="border-top-color:var(--err)"><div class="valeur" style="color:var(--err);${neon('#ff4d6d')}">${s.echecs || 0}</div><div class="libelle">Échoués</div></div>
+    <div class="stat" style="border-top-color:var(--violet)"><div class="valeur" style="color:var(--violet);${neon('#b758ff')}">${Math.round(s.duree_moyenne || 0)}s</div><div class="libelle">Durée moyenne</div></div>
+    <div class="stat" style="border-top-color:var(--jaune)"><div class="valeur" style="color:var(--jaune);${neon('#ffe34d')}">${s.rdv_pris || 0}</div><div class="libelle">RDV pris</div></div>
+    <div class="stat" style="border-top-color:var(--rose)"><div class="valeur" style="color:var(--rose);${neon('#ff2d9e')}">${tauxReponse}%</div><div class="libelle">Taux de réponse</div></div>
   `;
 }
 async function chargerDashboard() { await chargerCampagnes(); rendreStats('statsGlobales', await appelJson('/api/stats')); if (document.getElementById('dashboardCampagneSelect').value) chargerStatsCampagne(); }
