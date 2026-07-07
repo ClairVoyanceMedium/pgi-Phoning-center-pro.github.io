@@ -10,22 +10,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   :root {
-    --bg: #0d0e11;
-    --panel: #15171b;
-    --panel2: #1c1f24;
-    --border: #3c414a;
-    --texte: #e8edf0;
-    --texte-dim: #8b94a0;
-    --violet: #b758ff;
-    --vert: #2ee87a;
-    --orange: #ff9d3d;
-    --cyan: #34c8ff;
-    --rose: #ff2d9e;
-    --jaune: #ffe34d;
-    --turquoise: #2de8c2;
-    --ok: #2ee87a;
-    --warn: #ffb02e;
-    --err: #ff4d6d;
+    --bg: #0d0e11; --panel: #15171b; --panel2: #1c1f24; --border: #3c414a;
+    --texte: #e8edf0; --texte-dim: #8b94a0;
+    --violet: #b758ff; --vert: #2ee87a; --orange: #ff9d3d; --cyan: #34c8ff;
+    --rose: #ff2d9e; --jaune: #ffe34d; --turquoise: #2de8c2; --err: #ff4d6d;
+    --ok: #2ee87a; --warn: #ffb02e;
     --font-main: 'Montserrat', sans-serif;
   }
   * { box-sizing: border-box; }
@@ -38,28 +27,30 @@
   header { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; position: sticky; top: 0; background: var(--bg); z-index: 6; }
   .titre-app {
     font-size: 17px; letter-spacing: 2px; text-transform: uppercase; font-weight: 800;
-    color: #8fe8ff; text-shadow: 0 0 6px #00f0ffaa, 0 0 16px #00f0ff66;
+    color: #8fe8ff; text-shadow: 0 0 7px #00f0ffcc, 0 0 18px #00f0ff88;
     animation: clignote 3.2s ease-in-out infinite;
   }
-  @keyframes clignote { 0%,100% { opacity: 1; text-shadow: 0 0 7px #00f0ffcc, 0 0 18px #00f0ff88; } 50% { opacity: .7; text-shadow: 0 0 3px #00f0ff66, 0 0 8px #00f0ff33; } }
+  @keyframes clignote {
+    0%,100% { opacity: 1; text-shadow: 0 0 7px #00f0ffcc, 0 0 18px #00f0ff88; }
+    50%      { opacity: .7; text-shadow: 0 0 3px #00f0ff66, 0 0 8px #00f0ff33; }
+  }
   .etat-bar { display: flex; gap: 6px; flex-wrap: wrap; }
   .puce { font-size: 10px; padding: 3px 8px; border-radius: 10px; border: 1px solid var(--border); color: var(--texte-dim); background: #00000033; }
-  .puce.ok { color: var(--vert); border-color: var(--vert); box-shadow: 0 0 6px #2ee87a55; }
-  .puce.off { color: var(--err); border-color: var(--err); }
+  .puce.ok  { color: var(--vert);  border-color: var(--vert);  box-shadow: 0 0 6px #2ee87a55; }
+  .puce.off { color: var(--err);   border-color: var(--err); }
 
   main { padding: 14px; max-width: 920px; margin: 0 auto; }
   .vue { display: none; }
   .vue.active { display: block; }
 
   .panel { background: var(--panel); border: 1px solid var(--border); border-top-width: 3px; border-radius: 10px; padding: 16px; margin-bottom: 14px; }
-  .panel.c-violet { border-top-color: var(--violet); }
-  .panel.c-vert { border-top-color: var(--vert); }
-  .panel.c-orange { border-top-color: var(--orange); }
-  .panel.c-cyan { border-top-color: var(--cyan); }
-  .panel.c-rose { border-top-color: var(--rose); }
-  .panel.c-jaune { border-top-color: var(--jaune); }
+  .panel.c-violet  { border-top-color: var(--violet); }
+  .panel.c-vert    { border-top-color: var(--vert); }
+  .panel.c-orange  { border-top-color: var(--orange); }
+  .panel.c-cyan    { border-top-color: var(--cyan); }
+  .panel.c-rose    { border-top-color: var(--rose); }
+  .panel.c-jaune   { border-top-color: var(--jaune); }
   .panel.c-turquoise { border-top-color: var(--turquoise); }
-
   .panel h2 {
     margin: 0 0 12px; font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 800;
     color: #ff7fd0; text-shadow: 0 0 5px #ff2d9eaa, 0 0 12px #ff2d9e44;
@@ -72,11 +63,12 @@
 
   button { background: transparent; border: 1px solid var(--cyan); color: var(--cyan); padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; text-transform: uppercase; letter-spacing: .5px; margin-top: 10px; width: 100%; font-weight: 700; }
   button:active { background: var(--cyan); color: #001016; }
-  button.secondaire { border-color: var(--texte-dim); color: var(--texte-dim); }
-  button.danger { border-color: var(--err); color: var(--err); }
-  button.vert { border-color: var(--vert); color: var(--vert); }
-  button.violet { border-color: var(--violet); color: var(--violet); }
-  button.orange { border-color: var(--orange); color: var(--orange); }
+  button.secondaire  { border-color: var(--texte-dim); color: var(--texte-dim); }
+  button.danger      { border-color: var(--err);    color: var(--err); }
+  button.vert        { border-color: var(--vert);   color: var(--vert); }
+  button.violet      { border-color: var(--violet); color: var(--violet); }
+  button.orange      { border-color: var(--orange); color: var(--orange); }
+  button.rose        { border-color: var(--rose);   color: var(--rose); }
   button.small { width: auto; padding: 6px 10px; font-size: 11px; margin: 4px 4px 0 0; }
 
   .row { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -89,7 +81,8 @@
   .badge { display: inline-block; padding: 3px 9px; border-radius: 10px; font-size: 10px; text-transform: uppercase; font-weight: 700; }
   .badge.actif, .badge.repondu, .badge.termine { background: #2ee87a22; color: var(--ok); }
   .badge.pause, .badge.en_cours { background: #ffb02e22; color: var(--warn); }
-  .badge.arrete, .badge.echoue, .badge.sans_reponse, .badge.occupe { background: #ff4d6d22; color: var(--err); }
+  .badge.arrete, .badge.echoue, .badge.sans_reponse, .badge.occupe,
+  .badge.annule, .badge.timeout, .badge.erreur { background: #ff4d6d22; color: var(--err); }
   .badge.rdv { background: #ffe34d22; color: var(--jaune); }
 
   table { width: 100%; border-collapse: collapse; font-size: 12px; }
@@ -100,13 +93,9 @@
 
   .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .stat { background: var(--panel2); border-radius: 8px; padding: 14px; text-align: center; border-top: 3px solid var(--border); }
-  .stat .valeur { font-size: 26px; font-weight: 500; }
-  .stat .libelle { font-size: 10px; color: var(--texte-dim); text-transform: uppercase; margin-top: 4px; letter-spacing: 0.5px; }
+  .stat .valeur  { font-size: 26px; font-weight: 500; }
+  .stat .libelle { font-size: 10px; color: var(--texte-dim); text-transform: uppercase; margin-top: 4px; letter-spacing: .5px; }
 
-  .note-item { background: var(--panel2); border-radius: 6px; padding: 10px; margin-bottom: 8px; font-size: 13px; border-left: 3px solid var(--violet); }
-  .note-item a { color: var(--cyan); text-decoration: underline; }
-
-  /* Cartes Notes façon "Modifié + Sauvegarder/Supprimer" */
   .carte-note { background: var(--panel2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 14px; }
   .carte-note .note-titre-edit { background: transparent; border: none; border-bottom: 1px dashed var(--border); color: #ff7fd0; font-weight: 800; font-size: 14px; width: 100%; margin-bottom: 8px; padding: 2px 0; }
   .carte-note .note-titre-edit:focus { outline: none; border-bottom-color: var(--rose); }
@@ -120,47 +109,51 @@
   .btn-sauvegarder, .btn-supprimer { width: auto; margin: 0; padding: 9px 16px; font-size: 12px; }
   .btn-sauvegarder { background: #2f6fed; border: 1px solid #2f6fed; color: #fff; }
   .btn-sauvegarder:active { background: #2559c4; }
-  .btn-supprimer { background: #3a1620; border: 1px solid #ff4d6d; color: #ff8fa3; }
+  .btn-supprimer   { background: #3a1620; border: 1px solid #ff4d6d; color: #ff8fa3; }
   .btn-supprimer:active { background: #511a26; }
 
-  /* Liens — style compact : une ligne par lien */
   .lien-ligne { display: flex; align-items: center; gap: 8px; background: var(--panel2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; }
   .lien-ligne a.lien-ouvrir { color: var(--turquoise); font-size: 13px; font-weight: 700; text-decoration: none; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .lien-ligne a.lien-ouvrir:hover { text-decoration: underline; }
   .lien-ligne .lien-domaine { font-size: 10px; color: var(--texte-dim); flex: 0 0 auto; }
   .lien-ligne .lien-actions { display: flex; gap: 4px; flex: 0 0 auto; }
-  .lien-ligne button.small { margin: 0; }
-  /* Formulaire d'édition inline d'un lien (masqué par défaut) */
   .lien-edit-form { background: var(--panel2); border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin-bottom: 6px; display: none; }
   .lien-edit-form.visible { display: block; }
-  .grille-liens { display: block; } /* gardé pour compatibilité JS existant */
-  .note-meta { font-size: 10px; color: var(--texte-dim); margin-top: 6px; }
 
-  .campagne-item { background: var(--panel2); border-radius: 8px; padding: 12px; margin-bottom: 8px; border-left: 3px solid var(--cyan); }
+  .campagne-item { background: var(--panel2); border-radius: 8px; padding: 12px; margin-bottom: 10px; border-left: 3px solid var(--cyan); }
+  .campagne-item .camp-titre { font-size: 15px; font-weight: 700; color: var(--texte); }
+  .campagne-item .camp-meta  { font-size: 11px; color: var(--texte-dim); margin: 4px 0 8px; }
+  .campagne-item .boutons-camp { display: flex; flex-wrap: wrap; gap: 6px; }
+  .campagne-item .boutons-camp button { width: auto; margin: 0; padding: 6px 12px; font-size: 11px; }
+
   .liste-item { background: var(--panel2); border-radius: 8px; padding: 10px; margin-bottom: 8px; border-left: 3px solid var(--orange); }
 
   nav.tabs { position: fixed; bottom: 0; left: 0; right: 0; display: flex; background: #14161a; border-top: 1px solid var(--border); z-index: 10; }
   nav.tabs button { flex: 1; background: none; border: none; padding: 7px 2px 8px; font-size: 9px; text-transform: uppercase; margin: 0; border-radius: 0; font-weight: 700; opacity: .55; display: flex; flex-direction: column; align-items: center; gap: 2px; }
   nav.tabs button .icone { font-size: 16px; line-height: 1; }
-  nav.tabs button.active { opacity: 1; }
+  nav.tabs button.active { opacity: 1; text-shadow: 0 0 8px currentColor; }
+  /* Ordre : Campagnes(1) Contacts(2) Rapports(3) Board(4) Notes(5) Liens(6) Config(7) */
   nav.tabs button:nth-child(1) { color: var(--violet); }
   nav.tabs button:nth-child(2) { color: var(--orange); }
-  nav.tabs button:nth-child(3) { color: var(--vert); }
-  nav.tabs button:nth-child(4) { color: var(--rose); }
+  nav.tabs button:nth-child(3) { color: var(--rose); }
+  nav.tabs button:nth-child(4) { color: var(--vert); }
   nav.tabs button:nth-child(5) { color: var(--jaune); }
   nav.tabs button:nth-child(6) { color: var(--turquoise); }
   nav.tabs button:nth-child(7) { color: var(--cyan); }
-  nav.tabs button.active { text-shadow: 0 0 8px currentColor; }
 
   .modal-overlay { display: none; position: fixed; inset: 0; background: #000000d0; z-index: 50; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 20px 10px; }
   .modal-overlay.active { display: flex; }
-  .modal { background: var(--panel); border: 1px solid var(--rose); border-radius: 10px; padding: 18px; max-width: 600px; width: 100%; }
+  .modal { background: var(--panel); border: 1px solid var(--rose); border-radius: 10px; padding: 18px; max-width: 640px; width: 100%; }
   .modal h3 { margin-top: 0; color: #ff7fd0; text-shadow: 0 0 6px #ff2d9eaa; }
   .modal-section { margin-bottom: 12px; }
   .modal-section b { color: var(--texte-dim); font-size: 11px; text-transform: uppercase; display: block; margin-bottom: 3px; }
   .transcript-line { padding: 4px 0; font-size: 13px; }
-  .transcript-line.agent { color: var(--cyan); }
+  .transcript-line.agent   { color: var(--cyan); }
   .transcript-line.prospect { color: var(--vert); }
+
+  /* Formulaire de modification campagne (modal) */
+  .modal-camp { background: var(--panel); border: 1px solid var(--violet); border-radius: 10px; padding: 18px; max-width: 640px; width: 100%; max-height: 90vh; overflow-y: auto; }
+  .modal-camp h3 { margin-top: 0; color: #c490ff; }
 </style>
 </head>
 <body>
@@ -175,55 +168,6 @@
 
 <main>
 
-  <!-- CONFIG -->
-  <section class="vue" id="vue-config">
-    <div class="panel c-cyan">
-      <h2>Configuration Worker</h2>
-      <label>URL du Worker</label>
-      <input id="workerUrl" placeholder="https://pgi-phoning-center-pro.tonsubdomain.workers.dev" />
-      <label>Clé API</label>
-      <input id="apiKey" type="password" placeholder="valeur de la variable API_KEY du Worker" />
-      <button onclick="sauverConfig()">Enregistrer et tester la connexion</button>
-      <p class="hint">Stocké uniquement dans ce navigateur. Lis le mode d'emploi (GUIDE.md) pour savoir où récupérer chaque valeur.</p>
-    </div>
-  </section>
-
-  <!-- LISTES DE CONTACTS -->
-  <section class="vue" id="vue-listes">
-    <div class="panel c-orange">
-      <h2>Créer une liste de contacts</h2>
-      <label>Nom de la liste</label>
-      <input id="listeNom" placeholder="Ex: Prospects voyance France" />
-      <button class="orange" onclick="creerListe()">Créer la liste</button>
-    </div>
-
-    <div class="panel c-orange">
-      <h2>Importer dans une liste</h2>
-      <label>Liste cible</label>
-      <select id="listeSelectImport"></select>
-      <label>Langue par défaut si non précisée</label>
-      <select id="listeLangueDefaut">
-        <option value="fr">Français</option><option value="en">Anglais</option><option value="es">Espagnol</option>
-        <option value="it">Italien</option><option value="de">Allemand</option><option value="pt">Portugais</option><option value="sv">Suédois</option>
-      </select>
-      <label>Coller une liste (téléphone,prénom,nom,pays,langue,notes — ou juste le numéro)</label>
-      <textarea id="contactsCsv" rows="5" placeholder="+33612345678,Jean,Dupont&#10;+14155552671&#10;+393331234567,Maria,Rossi"></textarea>
-      <button onclick="importerCsv()">Importer le texte collé</button>
-      <label>Fichier Excel (.xlsx) ou CSV</label>
-      <input type="file" id="fichierImport" accept=".xlsx,.xls,.csv" />
-      <button class="secondaire" onclick="importerFichier()">Importer le fichier</button>
-      <label>URL Google Sheet publiée en CSV</label>
-      <input id="urlGoogleSheet" placeholder="https://docs.google.com/.../pub?output=csv" />
-      <button class="secondaire" onclick="importerDepuisUrl()">Importer depuis l'URL</button>
-      <p class="hint">Google Contacts : exporte en CSV depuis Google Contacts, puis importe ce fichier ci-dessus. Un numéro seul, sans nom, est accepté.</p>
-    </div>
-
-    <div class="panel c-orange">
-      <h2>Listes existantes</h2>
-      <div id="listeListes"></div>
-    </div>
-  </section>
-
   <!-- CAMPAGNES -->
   <section class="vue" id="vue-campagnes">
     <div class="panel c-violet">
@@ -236,69 +180,67 @@
         <div>
           <label>Pays ciblé</label>
           <select id="campPays">
-            <option value="FR">France</option><option value="US">États-Unis</option><option value="IT">Italie</option>
-            <option value="ES">Espagne</option><option value="GB">Royaume-Uni</option><option value="DE">Allemagne</option>
-            <option value="PT">Portugal</option><option value="SE">Suède</option><option value="XX">Autre</option>
+            <option value="FR">France</option><option value="US">États-Unis</option>
+            <option value="IT">Italie</option><option value="ES">Espagne</option>
+            <option value="GB">Royaume-Uni</option><option value="DE">Allemagne</option>
+            <option value="PT">Portugal</option><option value="SE">Suède</option>
+            <option value="BE">Belgique</option><option value="LU">Luxembourg</option>
+            <option value="XX">Autre</option>
           </select>
         </div>
         <div>
-          <label>Langue de conversation</label>
+          <label>Langue</label>
           <select id="campLangue">
-            <option value="fr">Français</option><option value="en">Anglais</option><option value="es">Espagnol</option>
-            <option value="it">Italien</option><option value="de">Allemand</option><option value="pt">Portugais</option><option value="sv">Suédois</option>
+            <option value="fr">Français</option><option value="en">Anglais</option>
+            <option value="es">Espagnol</option><option value="it">Italien</option>
+            <option value="de">Allemand</option><option value="pt">Portugais</option>
+            <option value="sv">Suédois</option>
           </select>
         </div>
       </div>
-      <label>Sujet de l'appel</label>
+      <label>Sujet</label>
       <input id="campSujet" placeholder="Ex: Voyance, Pièces automobiles..." />
-      <label>Objectif final de l'appel</label>
+      <label>Objectif final</label>
       <textarea id="campObjectif" rows="2"></textarea>
-      <label>Introduction (idée d'ouverture)</label>
+      <label>Introduction</label>
       <textarea id="campIntro" rows="2"></textarea>
-      <label>Points clés à aborder (un par ligne)</label>
+      <label>Points clés (un par ligne)</label>
       <textarea id="campPoints" rows="3"></textarea>
-      <label>Mots-clés à utiliser (séparés par des virgules)</label>
+      <label>Mots-clés (séparés par des virgules)</label>
       <input id="campMots" />
       <label>Sujets à éviter (un par ligne)</label>
       <textarea id="campEviter" rows="2"></textarea>
-      <label>Capacités commerciales (offres/prix/arguments autorisés)</label>
+      <label>Capacités commerciales</label>
       <textarea id="campCapacites" rows="3"></textarea>
-      <label>Directives comportementales (ton, politesse, conditions RDV, conditions fin d'appel...)</label>
+      <label>Directives comportementales</label>
       <textarea id="campDirectives" rows="3"></textarea>
-
       <label><input type="checkbox" id="campRepondeurActif" /> Laisser un message si répondeur détecté</label>
-      <textarea id="campRepondeurMessage" rows="2" placeholder="Message lu si la personne ne répond pas"></textarea>
-
+      <textarea id="campRepondeurMessage" rows="2" placeholder="Message lu si répondeur"></textarea>
       <label>Prestataire vocal</label>
       <select id="campPrestataireVoix">
         <option value="workers-ai">Cloudflare Workers AI (gratuit — FR/EN/ES)</option>
-        <option value="elevenlabs">ElevenLabs (payant — toutes langues, dont suédois/italien)</option>
+        <option value="elevenlabs">ElevenLabs (payant — toutes langues)</option>
       </select>
-
       <div class="row">
         <div>
-          <label>Ordre des appels dans la liste</label>
+          <label>Ordre des appels</label>
           <select id="campOrdreAppel">
-            <option value="sequentiel">Séquentiel (dans l'ordre d'ajout)</option>
+            <option value="sequentiel">Séquentiel</option>
             <option value="aleatoire">Aléatoire</option>
           </select>
         </div>
         <div>
-          <label>Quand la liste est terminée</label>
+          <label>Fin de liste</label>
           <select id="campComportementFin">
             <option value="arret">La campagne s'arrête</option>
-            <option value="boucle">Recommence en boucle depuis le 1er numéro</option>
+            <option value="boucle">Boucle infinie</option>
           </select>
         </div>
       </div>
-      <p class="hint">Si tu ajoutes des numéros en cours de route, ils s'ajoutent automatiquement à la fin de la file et seront appelés sans tout recommencer.</p>
-
-      <label>Créneaux d'appel — pour chacun, fixe combien d'appels minimum et maximum ce jour-là (0 = pas d'objectif / illimité)</label>
+      <label>Créneaux d'appel</label>
       <div id="creneauxContainer"></div>
       <button type="button" class="secondaire small" onclick="ajouterLigneCreneau()">+ Ajouter un créneau</button>
-
-      <label><input type="checkbox" id="campAuto" /> Activer l'automatisation (le Worker lance seul les appels dans les créneaux définis, en respectant les quotas min/max)</label>
-
+      <label><input type="checkbox" id="campAuto" /> Activer l'automatisation</label>
       <button class="violet" onclick="creerCampagne()">Créer la campagne</button>
     </div>
 
@@ -308,7 +250,59 @@
     </div>
   </section>
 
-  <!-- DASHBOARD -->
+  <!-- CONTACTS -->
+  <section class="vue" id="vue-listes">
+    <div class="panel c-orange">
+      <h2>Créer une liste de contacts</h2>
+      <label>Nom de la liste</label>
+      <input id="listeNom" placeholder="Ex: Prospects voyance France" />
+      <button class="orange" onclick="creerListe()">Créer la liste</button>
+    </div>
+    <div class="panel c-orange">
+      <h2>Importer dans une liste</h2>
+      <label>Liste cible</label>
+      <select id="listeSelectImport"></select>
+      <label>Langue par défaut</label>
+      <select id="listeLangueDefaut">
+        <option value="fr">Français</option><option value="en">Anglais</option>
+        <option value="es">Espagnol</option><option value="it">Italien</option>
+        <option value="de">Allemand</option><option value="pt">Portugais</option>
+        <option value="sv">Suédois</option>
+      </select>
+      <label>Coller une liste (téléphone,prénom,nom,pays,langue — ou juste le numéro)</label>
+      <textarea id="contactsCsv" rows="5" placeholder="+33612345678,Jean,Dupont&#10;+14155552671&#10;+393331234567,Maria,Rossi"></textarea>
+      <button onclick="importerCsv()">Importer le texte collé</button>
+      <label>Fichier Excel (.xlsx) ou CSV</label>
+      <input type="file" id="fichierImport" accept=".xlsx,.xls,.csv" />
+      <button class="secondaire" onclick="importerFichier()">Importer le fichier</button>
+      <label>URL Google Sheet publiée en CSV</label>
+      <input id="urlGoogleSheet" placeholder="https://docs.google.com/.../pub?output=csv" />
+      <button class="secondaire" onclick="importerDepuisUrl()">Importer depuis l'URL</button>
+    </div>
+    <div class="panel c-orange">
+      <h2>Listes existantes</h2>
+      <div id="listeListes"></div>
+    </div>
+  </section>
+
+  <!-- RAPPORTS -->
+  <section class="vue" id="vue-rapports">
+    <div class="panel c-rose">
+      <h2>Rapports d'appels</h2>
+      <select id="rapportsCampagneSelect" onchange="chargerAppels()"></select>
+      <div class="row" style="margin-top:8px;">
+        <button class="secondaire" onclick="chargerAppels()">Rafraîchir</button>
+        <button class="vert" onclick="exporterCsv()">Exporter CSV</button>
+        <button class="orange" onclick="nettoyerBlockes()">Nettoyer bloqués</button>
+      </div>
+      <table style="margin-top:10px;">
+        <thead><tr><th>Contact</th><th>Statut</th><th>RDV</th><th>Durée</th><th>Action</th></tr></thead>
+        <tbody id="appelsBody"><tr><td colspan="5" class="hint">Sélectionne une campagne.</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- BOARD (4e position) -->
   <section class="vue active" id="vue-dashboard">
     <div class="panel c-vert">
       <h2>Vue d'ensemble (toutes campagnes)</h2>
@@ -321,19 +315,14 @@
     </div>
   </section>
 
-  <!-- RAPPORTS -->
-  <section class="vue" id="vue-rapports">
-    <div class="panel c-rose">
-      <h2>Rapports d'appels</h2>
-      <select id="rapportsCampagneSelect" onchange="chargerAppels()"></select>
-      <div class="row" style="margin-top:8px;">
-        <button class="secondaire" onclick="chargerAppels()">Rafraîchir</button>
-        <button class="vert" onclick="exporterCsv()">Exporter CSV</button>
-      </div>
-      <table style="margin-top:10px;">
-        <thead><tr><th>Contact</th><th>Pays</th><th>Statut</th><th>RDV</th><th>Durée</th></tr></thead>
-        <tbody id="appelsBody"><tr><td colspan="5" class="hint">Sélectionne une campagne.</td></tr></tbody>
-      </table>
+  <!-- NOTES -->
+  <section class="vue" id="vue-notes">
+    <div class="panel c-jaune">
+      <h2>Notes personnelles</h2>
+      <button class="btn-sauvegarder" style="margin-bottom:10px;" onclick="ajouterNote()">+ Nouvelle note</button>
+      <p class="hint">Sauvegardées dans le cloud — accessibles sur tous vos appareils.</p>
+      <textarea id="nouvelleNote" rows="3" placeholder="Texte de la nouvelle note..."></textarea>
+      <div id="listeNotes" style="margin-top:16px;"></div>
     </div>
   </section>
 
@@ -341,89 +330,115 @@
   <section class="vue" id="vue-liens">
     <div class="panel c-turquoise">
       <h2>Liens utiles</h2>
-      <p class="hint">💡 Touche le nom pour le renommer, touche la carte (l'icône 🔗) pour ouvrir le lien. Aucune limite de nombre.</p>
-      <label>Libellé (optionnel)</label>
+      <p class="hint">💡 Touche le nom pour le renommer, touche l'icône 🔗 pour ouvrir.</p>
+      <label>Libellé</label>
       <input id="nouveauLienLibelle" placeholder="Ex: Console Telnyx" />
       <label>URL</label>
       <input id="nouveauLienUrl" placeholder="https://..." />
       <button style="border-color:var(--turquoise); color:var(--turquoise);" onclick="ajouterLien()">+ Ajouter un lien</button>
-      <div id="listeLiens" class="grille-liens" style="margin-top:16px;"></div>
+      <div id="listeLiens" style="margin-top:16px;"></div>
     </div>
   </section>
 
-  <!-- NOTES -->
-  <section class="vue" id="vue-notes">
-    <div class="panel c-jaune">
-      <h2>Notes personnelles</h2>
-      <button class="btn-sauvegarder" style="margin-bottom:10px;" onclick="ajouterNote()">+ Nouvelle note</button>
-      <p class="hint">Vos notes sont sauvegardées dans le cloud (Worker) — accessibles sur tous vos appareils. Aucune limite de nombre.</p>
-      <textarea id="nouvelleNote" rows="3" placeholder="Texte de la nouvelle note... (liens cliquables automatiquement)" style="margin-top:6px;"></textarea>
-      <div id="listeNotes" style="margin-top:16px;"></div>
+  <!-- CONFIG -->
+  <section class="vue" id="vue-config">
+    <div class="panel c-cyan">
+      <h2>Configuration Worker</h2>
+      <label>URL du Worker</label>
+      <input id="workerUrl" placeholder="https://pgi-phoning-center-pro.xxx.workers.dev" />
+      <label>Clé API</label>
+      <input id="apiKey" type="password" placeholder="valeur de la variable API_KEY" />
+      <button onclick="sauverConfig()">Enregistrer et tester la connexion</button>
+      <p class="hint">Stocké uniquement dans ce navigateur (localStorage isolé).</p>
     </div>
   </section>
 
 </main>
 
+<!-- Navigation : Campagnes(1) Contacts(2) Rapports(3) Board(4) Notes(5) Liens(6) Config(7) -->
 <nav class="tabs">
   <button onclick="changerVue('campagnes')" id="tab-campagnes"><span class="icone">📞</span>Campagnes</button>
-  <button onclick="changerVue('listes')" id="tab-listes"><span class="icone">👥</span>Contacts</button>
+  <button onclick="changerVue('listes')"    id="tab-listes"><span class="icone">👥</span>Contacts</button>
+  <button onclick="changerVue('rapports')"  id="tab-rapports"><span class="icone">📋</span>Rapports</button>
   <button onclick="changerVue('dashboard')" id="tab-dashboard" class="active"><span class="icone">📊</span>Board</button>
-  <button onclick="changerVue('rapports')" id="tab-rapports"><span class="icone">📋</span>Rapports</button>
-  <button onclick="changerVue('notes')" id="tab-notes"><span class="icone">📝</span>Notes</button>
-  <button onclick="changerVue('liens')" id="tab-liens"><span class="icone">🔗</span>Liens</button>
-  <button onclick="changerVue('config')" id="tab-config"><span class="icone">⚙️</span>Config</button>
+  <button onclick="changerVue('notes')"     id="tab-notes"><span class="icone">📝</span>Notes</button>
+  <button onclick="changerVue('liens')"     id="tab-liens"><span class="icone">🔗</span>Liens</button>
+  <button onclick="changerVue('config')"    id="tab-config"><span class="icone">⚙️</span>Config</button>
 </nav>
 
+<!-- Modale rapport d'appel -->
 <div class="modal-overlay" id="modalAppel"><div class="modal" id="modalAppelContenu"></div></div>
 
+<!-- Modale modification campagne -->
+<div class="modal-overlay" id="modalModifCamp">
+  <div class="modal-camp" id="modalModifContenu">
+    <h3>✎ Modifier la campagne</h3>
+    <label>Nom</label><input id="editNom" />
+    <label>Liste de contacts</label><select id="editListe"></select>
+    <div class="row">
+      <div><label>Pays</label>
+        <select id="editPays">
+          <option value="FR">France</option><option value="US">États-Unis</option>
+          <option value="IT">Italie</option><option value="ES">Espagne</option>
+          <option value="GB">Royaume-Uni</option><option value="DE">Allemagne</option>
+          <option value="PT">Portugal</option><option value="SE">Suède</option>
+          <option value="BE">Belgique</option><option value="LU">Luxembourg</option>
+          <option value="XX">Autre</option>
+        </select>
+      </div>
+      <div><label>Langue</label>
+        <select id="editLangue">
+          <option value="fr">Français</option><option value="en">Anglais</option>
+          <option value="es">Espagnol</option><option value="it">Italien</option>
+          <option value="de">Allemand</option><option value="pt">Portugais</option>
+          <option value="sv">Suédois</option>
+        </select>
+      </div>
+    </div>
+    <label>Sujet</label><input id="editSujet" />
+    <label>Objectif</label><textarea id="editObjectif" rows="2"></textarea>
+    <label>Introduction</label><textarea id="editIntro" rows="2"></textarea>
+    <label>Points clés (un par ligne)</label><textarea id="editPoints" rows="3"></textarea>
+    <label>Mots-clés</label><input id="editMots" />
+    <label>Sujets à éviter</label><textarea id="editEviter" rows="2"></textarea>
+    <label>Capacités commerciales</label><textarea id="editCapacites" rows="3"></textarea>
+    <label>Directives comportementales</label><textarea id="editDirectives" rows="3"></textarea>
+    <label><input type="checkbox" id="editRepondeurActif" /> Laisser un message si répondeur</label>
+    <textarea id="editRepondeurMessage" rows="2" placeholder="Message répondeur"></textarea>
+    <label>Prestataire vocal</label>
+    <select id="editPrestataireVoix">
+      <option value="workers-ai">Cloudflare Workers AI</option>
+      <option value="elevenlabs">ElevenLabs</option>
+    </select>
+    <div class="row">
+      <div><label>Ordre des appels</label>
+        <select id="editOrdreAppel">
+          <option value="sequentiel">Séquentiel</option>
+          <option value="aleatoire">Aléatoire</option>
+        </select>
+      </div>
+      <div><label>Fin de liste</label>
+        <select id="editComportementFin">
+          <option value="arret">Arrêt</option>
+          <option value="boucle">Boucle</option>
+        </select>
+      </div>
+    </div>
+    <label>Créneaux</label>
+    <div id="editCreneauxContainer"></div>
+    <button type="button" class="secondaire small" onclick="ajouterLigneCreneauEdit()">+ Créneau</button>
+    <label><input type="checkbox" id="editAuto" /> Automatisation active</label>
+    <div class="row" style="margin-top:14px;">
+      <button class="violet" onclick="sauvegarderModif()">💾 Enregistrer les modifications</button>
+      <button class="secondaire" onclick="fermerModalModif()">Annuler</button>
+    </div>
+  </div>
+</div>
+
 <script>
-let creneauxTemp = [];
-
-function changerVue(nom) {
-  document.querySelectorAll('.vue').forEach(v => v.classList.remove('active'));
-  document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active'));
-  document.getElementById('vue-' + nom).classList.add('active');
-  document.getElementById('tab-' + nom).classList.add('active');
-  if (nom === 'dashboard') chargerDashboard();
-  if (nom === 'rapports') { chargerCampagnes(); chargerAppels(); }
-  if (nom === 'notes') chargerNotes();
-  if (nom === 'liens') chargerLiens();
-  if (nom === 'listes') chargerListes();
-  if (nom === 'campagnes') chargerCampagnes();
-}
-
-function cfg() {
-  const urlBrute = document.getElementById('workerUrl').value.trim()
-    || localStorage.getItem('pgi_phoning_center_pro_workerUrl')
-    || '';
-  let url = urlBrute;
-  if (url && !url.startsWith('http://') && !url.startsWith('https://')) url = 'https://' + url;
-  return {
-    url: url.replace(/\/$/, ''),
-    key: document.getElementById('apiKey').value.trim() || localStorage.getItem('pgi_phoning_center_pro_apiKey') || '',
-  };
-}
-function cfgOk() {
-  const { url, key } = cfg();
-  return !!url && !!key;
-}
-async function sauverConfig() {
-  let url = document.getElementById('workerUrl').value.trim();
-  const key = document.getElementById('apiKey').value.trim();
-  if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
-    url = 'https://' + url;
-    document.getElementById('workerUrl').value = url;
-  }
-  // Stockage 100% isolé avec préfixe pgi_phoning_center_pro_
-  localStorage.setItem('pgi_phoning_center_pro_workerUrl', url);
-  localStorage.setItem('pgi_phoning_center_pro_apiKey', key);
-  await chargerEtat();
-  chargerCampagnes();
-  alert('Configuration enregistrée ✓');
-}
-
-// Migration unique depuis les anciennes clés courtes (pgi_worker_url, pgi_api_key)
-// vers les nouvelles clés préfixées isolées. Exécutée au chargement, une seule fois.
+// ─────────────────────────────────────────────────────────────
+// STOCKAGE ISOLÉ
+// ─────────────────────────────────────────────────────────────
 (function migrerAncienLocalStorage() {
   const migrations = [
     ['pgi_worker_url', 'pgi_phoning_center_pro_workerUrl', v => v.includes('workers.dev') || v.startsWith('https://')],
@@ -431,12 +446,50 @@ async function sauverConfig() {
   ];
   for (const [ancienne, nouvelle, valide] of migrations) {
     const ancVal = localStorage.getItem(ancienne);
-    if (ancVal && !localStorage.getItem(nouvelle) && valide(ancVal)) {
+    if (ancVal && !localStorage.getItem(nouvelle) && valide(ancVal))
       localStorage.setItem(nouvelle, ancVal);
-    }
-    localStorage.removeItem(ancienne); // supprimer l'ancienne clé dans tous les cas
+    localStorage.removeItem(ancienne);
   }
 })();
+
+function cfg() {
+  const urlBrute = document.getElementById('workerUrl').value.trim()
+    || localStorage.getItem('pgi_phoning_center_pro_workerUrl') || '';
+  let url = urlBrute;
+  if (url && !url.startsWith('http://') && !url.startsWith('https://')) url = 'https://' + url;
+  return { url: url.replace(/\/$/, ''), key: document.getElementById('apiKey').value.trim() || localStorage.getItem('pgi_phoning_center_pro_apiKey') || '' };
+}
+function cfgOk() { const { url, key } = cfg(); return !!url && !!key; }
+
+async function sauverConfig() {
+  let url = document.getElementById('workerUrl').value.trim();
+  const key = document.getElementById('apiKey').value.trim();
+  if (url && !url.startsWith('https://') && !url.startsWith('http://')) {
+    url = 'https://' + url;
+    document.getElementById('workerUrl').value = url;
+  }
+  localStorage.setItem('pgi_phoning_center_pro_workerUrl', url);
+  localStorage.setItem('pgi_phoning_center_pro_apiKey', key);
+  await chargerEtat();
+  chargerCampagnes();
+  alert('Configuration enregistrée ✓');
+}
+
+// ─────────────────────────────────────────────────────────────
+// NAVIGATION
+// ─────────────────────────────────────────────────────────────
+function changerVue(nom) {
+  document.querySelectorAll('.vue').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active'));
+  document.getElementById('vue-' + nom).classList.add('active');
+  document.getElementById('tab-' + nom).classList.add('active');
+  if (nom === 'dashboard') chargerDashboard();
+  if (nom === 'rapports')  { chargerCampagnes(); chargerAppels(); }
+  if (nom === 'notes')     chargerNotes();
+  if (nom === 'liens')     chargerLiens();
+  if (nom === 'listes')    chargerListes();
+  if (nom === 'campagnes') chargerCampagnes();
+}
 
 window.addEventListener('load', () => {
   const urlStocke = localStorage.getItem('pgi_phoning_center_pro_workerUrl') || '';
@@ -444,27 +497,33 @@ window.addEventListener('load', () => {
   document.getElementById('workerUrl').value = urlStocke;
   document.getElementById('apiKey').value    = keyStocke;
   ajouterLigneCreneau();
-  if (urlStocke && keyStocke) {
-    chargerEtat();
-    chargerCampagnes();
-  }
+  if (urlStocke && keyStocke) { chargerEtat(); chargerDashboard(); }
   setInterval(majHorloge, 1000);
   setInterval(() => { if (cfgOk()) chargerEtat(); }, 60000);
   majHorloge();
 });
-function majHorloge() { document.getElementById('horloge').textContent = new Date().toLocaleString('fr-FR', { timeZone: 'Europe/Paris' }); }
+
+function majHorloge() {
+  document.getElementById('horloge').textContent =
+    new Date().toLocaleString('fr-FR', { timeZone: 'Europe/Paris' });
+}
 
 async function appel(chemin, options = {}) {
   const { url, key } = cfg();
   if (!url || !key) { alert("Configure l'URL du Worker et la clé API dans l'onglet ⚙️ Config."); throw new Error('config manquante'); }
   const sep = chemin.includes('?') ? '&' : '?';
-  const res = await fetch(url + chemin + sep + 'key=' + encodeURIComponent(key), { ...options, headers: { 'content-type': 'application/json', 'x-api-key': key, ...(options.headers || {}) } });
+  const res = await fetch(url + chemin + sep + 'key=' + encodeURIComponent(key), {
+    ...options,
+    headers: { 'content-type': 'application/json', 'x-api-key': key, ...(options.headers || {}) }
+  });
   if (!res.ok) throw new Error(await res.text());
   return res;
 }
 async function appelJson(chemin, options) { return (await appel(chemin, options)).json(); }
 
-// ---------- État des connexions ----------
+// ─────────────────────────────────────────────────────────────
+// ÉTAT DES CONNEXIONS
+// ─────────────────────────────────────────────────────────────
 async function chargerEtat() {
   try {
     const e = await appelJson('/api/etat');
@@ -473,39 +532,65 @@ async function chargerEtat() {
       ['telephonie_telnyx', 'Téléphonie (Telnyx)'], ['ia_groq', 'IA (Groq)'], ['url_base_configuree', 'URL de base (cron)'],
     ];
     if ('voix_elevenlabs' in e) items.push(['voix_elevenlabs', 'Voix (ElevenLabs)']);
-    document.getElementById('etatBar').innerHTML = items.map(([k, libelle]) => `<span class="puce ${e[k] ? 'ok' : 'off'}">${libelle}</span>`).join('');
+    document.getElementById('etatBar').innerHTML =
+      items.map(([k, libelle]) => `<span class="puce ${e[k] ? 'ok' : 'off'}">${libelle}</span>`).join('');
   } catch {
     document.getElementById('etatBar').innerHTML = '<span class="puce off">Worker : non connecté</span>';
   }
 }
 
-// ---------- Créneaux ----------
-function ajouterLigneCreneau() {
-  creneauxTemp.push({ id: crypto.randomUUID(), jour: 'lundi', heure_debut: '09:00', heure_fin: '18:00', fuseau: 'Europe/Paris', appels_min: 0, appels_max: 0 });
-  rendreCreneaux();
-}
-function supprimerLigneCreneau(id) { creneauxTemp = creneauxTemp.filter(c => c.id !== id); rendreCreneaux(); }
-function majCreneau(id, champ, valeur) { const c = creneauxTemp.find(c => c.id === id); if (c) c[champ] = valeur; }
-function rendreCreneaux() {
-  const jours = ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'];
-  const fuseaux = ['Europe/Paris','America/New_York','America/Chicago','America/Los_Angeles','Europe/London','Europe/Rome','Europe/Madrid','Europe/Stockholm'];
-  document.getElementById('creneauxContainer').innerHTML = creneauxTemp.map(c => `
+// ─────────────────────────────────────────────────────────────
+// CRÉNEAUX
+// ─────────────────────────────────────────────────────────────
+let creneauxTemp = [];
+let editCreneauxTemp = [];
+
+const JOURS = ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'];
+const FUSEAUX = ['Europe/Paris','America/New_York','America/Chicago','America/Los_Angeles',
+  'Europe/London','Europe/Rome','Europe/Madrid','Europe/Stockholm','Europe/Brussels'];
+
+function renderCreneauxDans(conteneurId, liste, prefixFn, supprimerFn) {
+  document.getElementById(conteneurId).innerHTML = liste.map(c => `
     <div class="creneau-bloc">
       <div class="creneau-ligne">
-        <select onchange="majCreneau('${c.id}','jour',this.value)">${jours.map(j => `<option value="${j}" ${c.jour===j?'selected':''}>${j}</option>`).join('')}</select>
-        <input type="time" value="${c.heure_debut}" onchange="majCreneau('${c.id}','heure_debut',this.value)" />
-        <input type="time" value="${c.heure_fin}" onchange="majCreneau('${c.id}','heure_fin',this.value)" />
-        <select onchange="majCreneau('${c.id}','fuseau',this.value)">${fuseaux.map(f => `<option value="${f}" ${c.fuseau===f?'selected':''}>${f}</option>`).join('')}</select>
-        <button type="button" class="danger small" onclick="supprimerLigneCreneau('${c.id}')">✕</button>
+        <select onchange="${prefixFn}('${c.id}','jour',this.value)">
+          ${JOURS.map(j => `<option value="${j}" ${c.jour===j?'selected':''}>${j}</option>`).join('')}
+        </select>
+        <input type="time" value="${c.heure_debut}" onchange="${prefixFn}('${c.id}','heure_debut',this.value)" />
+        <input type="time" value="${c.heure_fin}"   onchange="${prefixFn}('${c.id}','heure_fin',this.value)" />
+        <select onchange="${prefixFn}('${c.id}','fuseau',this.value)">
+          ${FUSEAUX.map(f => `<option value="${f}" ${c.fuseau===f?'selected':''}>${f}</option>`).join('')}
+        </select>
+        <button type="button" class="danger small" onclick="${supprimerFn}('${c.id}')">✕</button>
       </div>
       <div class="creneau-ligne">
-        <div style="flex:1;"><label style="margin:0 0 2px;">Minimum d'appels ce jour</label><input type="number" min="0" value="${c.appels_min}" onchange="majCreneau('${c.id}','appels_min',parseInt(this.value||0))" /></div>
-        <div style="flex:1;"><label style="margin:0 0 2px;">Maximum (0 = illimité)</label><input type="number" min="0" value="${c.appels_max}" onchange="majCreneau('${c.id}','appels_max',parseInt(this.value||0))" /></div>
+        <div style="flex:1;"><label style="margin:0 0 2px;">Min/jour</label>
+          <input type="number" min="0" value="${c.appels_min||0}" onchange="${prefixFn}('${c.id}','appels_min',parseInt(this.value||0))" />
+        </div>
+        <div style="flex:1;"><label style="margin:0 0 2px;">Max (0=illimité)</label>
+          <input type="number" min="0" value="${c.appels_max||0}" onchange="${prefixFn}('${c.id}','appels_max',parseInt(this.value||0))" />
+        </div>
       </div>
     </div>`).join('');
 }
 
-// ---------- Listes de contacts ----------
+function ajouterLigneCreneau() {
+  creneauxTemp.push({ id: crypto.randomUUID(), jour:'lundi', heure_debut:'09:00', heure_fin:'18:00', fuseau:'Europe/Paris', appels_min:0, appels_max:0 });
+  renderCreneauxDans('creneauxContainer', creneauxTemp, 'majCreneau', 'supprimerLigneCreneau');
+}
+function supprimerLigneCreneau(id) { creneauxTemp = creneauxTemp.filter(c => c.id !== id); renderCreneauxDans('creneauxContainer', creneauxTemp, 'majCreneau', 'supprimerLigneCreneau'); }
+function majCreneau(id, champ, valeur) { const c = creneauxTemp.find(c => c.id === id); if (c) c[champ] = valeur; }
+
+function ajouterLigneCreneauEdit() {
+  editCreneauxTemp.push({ id: crypto.randomUUID(), jour:'lundi', heure_debut:'09:00', heure_fin:'18:00', fuseau:'Europe/Paris', appels_min:0, appels_max:0 });
+  renderCreneauxDans('editCreneauxContainer', editCreneauxTemp, 'majCreneauEdit', 'supprimerLigneCreneauEdit');
+}
+function supprimerLigneCreneauEdit(id) { editCreneauxTemp = editCreneauxTemp.filter(c => c.id !== id); renderCreneauxDans('editCreneauxContainer', editCreneauxTemp, 'majCreneauEdit', 'supprimerLigneCreneauEdit'); }
+function majCreneauEdit(id, champ, valeur) { const c = editCreneauxTemp.find(c => c.id === id); if (c) c[champ] = valeur; }
+
+// ─────────────────────────────────────────────────────────────
+// LISTES
+// ─────────────────────────────────────────────────────────────
 async function creerListe() {
   const nom = document.getElementById('listeNom').value.trim();
   if (!nom) return alert('Nom requis.');
@@ -513,22 +598,31 @@ async function creerListe() {
   document.getElementById('listeNom').value = '';
   chargerListes();
 }
+
 async function chargerListes() {
   const listes = await appelJson('/api/listes');
   document.getElementById('listeListes').innerHTML = listes.map(l => `
-    <div class="liste-item"><b>${l.nom}</b><br/><span class="hint">${l.nb_contacts} contact(s) · ${l.nb_a_appeler} à appeler</span></div>`).join('') || '<p class="hint">Aucune liste.</p>';
+    <div class="liste-item">
+      <b>${l.nom}</b><br/>
+      <span class="hint">${l.nb_contacts} contact(s) · ${l.nb_a_appeler} à appeler</span>
+    </div>`).join('') || '<p class="hint">Aucune liste.</p>';
   const options = listes.map(l => `<option value="${l.id}">${l.nom} (${l.nb_contacts})</option>`).join('');
-  ['listeSelectImport', 'campListe'].forEach(id => { const sel = document.getElementById(id); if (sel) { const v = sel.value; sel.innerHTML = options; if (v) sel.value = v; } });
+  ['listeSelectImport','campListe','editListe'].forEach(id => {
+    const sel = document.getElementById(id);
+    if (sel) { const v = sel.value; sel.innerHTML = options; if (v) sel.value = v; }
+  });
 }
+
 function parserTextePaste(texte) {
   return texte.split('\n').map(l => l.trim()).filter(Boolean).map(l => {
-    const [phone, prenom, nom, pays, langue, notes] = l.split(',').map(s => (s || '').trim());
+    const [phone, prenom, nom, pays, langue, notes] = l.split(',').map(s => (s||'').trim());
     return { phone, prenom: nom ? prenom : null, nom: nom || prenom || null, pays, langue, notes };
   });
 }
+
 async function importerCsv() {
   const id = document.getElementById('listeSelectImport').value;
-  if (!id) return alert('Sélectionne ou crée une liste.');
+  if (!id) return alert('Sélectionne une liste.');
   const langue_defaut = document.getElementById('listeLangueDefaut').value;
   const contacts = parserTextePaste(document.getElementById('contactsCsv').value);
   const res = await appelJson(`/api/listes/${id}/contacts`, { method: 'POST', body: JSON.stringify({ contacts, langue_defaut }) });
@@ -536,197 +630,336 @@ async function importerCsv() {
   document.getElementById('contactsCsv').value = '';
   chargerListes();
 }
+
 async function importerFichier() {
   const id = document.getElementById('listeSelectImport').value;
-  if (!id) return alert('Sélectionne ou crée une liste.');
+  if (!id) return alert('Sélectionne une liste.');
   const langue_defaut = document.getElementById('listeLangueDefaut').value;
   const fichier = document.getElementById('fichierImport').files[0];
   if (!fichier) return alert('Choisis un fichier.');
   const classeur = XLSX.read(await fichier.arrayBuffer());
   const lignes = XLSX.utils.sheet_to_json(classeur.Sheets[classeur.SheetNames[0]], { header: 1 });
   const contacts = lignes.filter(l => l[0] && String(l[0]).trim().startsWith('+'))
-    .map(l => ({ phone: String(l[0]).trim(), prenom: l[1] || null, nom: l[2] || null, pays: l[3] || null, langue: l[4] || null, notes: l[5] || null }));
+    .map(l => ({ phone: String(l[0]).trim(), prenom: l[1]||null, nom: l[2]||null, pays: l[3]||null, langue: l[4]||null, notes: l[5]||null }));
   const res = await appelJson(`/api/listes/${id}/contacts`, { method: 'POST', body: JSON.stringify({ contacts, langue_defaut }) });
-  alert(res.importes + ' contact(s) importé(s) depuis le fichier.');
-  chargerListes();
-}
-async function importerDepuisUrl() {
-  const id = document.getElementById('listeSelectImport').value;
-  if (!id) return alert('Sélectionne ou crée une liste.');
-  const langue_defaut = document.getElementById('listeLangueDefaut').value;
-  const url = document.getElementById('urlGoogleSheet').value.trim();
-  if (!url) return alert('Colle une URL.');
-  const res = await appelJson(`/api/listes/${id}/contacts/depuis-url`, { method: 'POST', body: JSON.stringify({ url, langue_defaut }) });
-  alert(res.importes + " contact(s) importé(s) depuis l'URL.");
+  alert(res.importes + ' contact(s) importé(s).');
   chargerListes();
 }
 
-// ---------- Campagnes ----------
-async function creerCampagne() {
-  const nom = document.getElementById('campNom').value.trim();
-  if (!nom) return alert('Le nom est requis.');
-  const payload = {
-    nom, liste_id: document.getElementById('campListe').value || null,
-    pays: document.getElementById('campPays').value, langue: document.getElementById('campLangue').value,
-    sujet: document.getElementById('campSujet').value.trim(), objectif: document.getElementById('campObjectif').value.trim(),
-    introduction: document.getElementById('campIntro').value.trim(), points_cles: document.getElementById('campPoints').value.trim(),
-    mots_cles: document.getElementById('campMots').value.trim(), sujets_a_eviter: document.getElementById('campEviter').value.trim(),
-    capacites_commerciales: document.getElementById('campCapacites').value.trim(), directives: document.getElementById('campDirectives').value.trim(),
-    repondeur_actif: document.getElementById('campRepondeurActif').checked, repondeur_message: document.getElementById('campRepondeurMessage').value.trim(),
-    prestataire_voix: document.getElementById('campPrestataireVoix').value,
-    ordre_appel: document.getElementById('campOrdreAppel').value, comportement_fin: document.getElementById('campComportementFin').value,
-    automatisation_active: document.getElementById('campAuto').checked,
-    creneaux: creneauxTemp.map(({ id, ...c }) => c),
+async function importerDepuisUrl() {
+  const id = document.getElementById('listeSelectImport').value;
+  if (!id) return alert('Sélectionne une liste.');
+  const langue_defaut = document.getElementById('listeLangueDefaut').value;
+  const urlSheet = document.getElementById('urlGoogleSheet').value.trim();
+  if (!urlSheet) return alert('Colle une URL.');
+  const res = await appelJson(`/api/listes/${id}/contacts/depuis-url`, { method: 'POST', body: JSON.stringify({ url: urlSheet, langue_defaut }) });
+  alert(res.importes + " contact(s) importé(s).");
+  chargerListes();
+}
+
+// ─────────────────────────────────────────────────────────────
+// CAMPAGNES
+// ─────────────────────────────────────────────────────────────
+function lireChampsFormulaire(prefix) {
+  const g = id => document.getElementById(prefix + id);
+  return {
+    nom:               g('Nom')?.value.trim(),
+    liste_id:          g('Liste')?.value || null,
+    pays:              g('Pays')?.value,
+    langue:            g('Langue')?.value,
+    sujet:             g('Sujet')?.value.trim(),
+    objectif:          g('Objectif')?.value.trim(),
+    introduction:      g('Intro')?.value.trim(),
+    points_cles:       g('Points')?.value.trim(),
+    mots_cles:         g('Mots')?.value.trim(),
+    sujets_a_eviter:   g('Eviter')?.value.trim(),
+    capacites_commerciales: g('Capacites')?.value.trim(),
+    directives:        g('Directives')?.value.trim(),
+    repondeur_actif:   g('RepondeurActif')?.checked,
+    repondeur_message: g('RepondeurMessage')?.value.trim(),
+    prestataire_voix:  g('PrestataireVoix')?.value,
+    ordre_appel:       g('OrdreAppel')?.value,
+    comportement_fin:  g('ComportementFin')?.value,
+    automatisation_active: g('Auto')?.checked,
   };
+}
+
+async function creerCampagne() {
+  const payload = lireChampsFormulaire('camp');
+  if (!payload.nom) return alert('Le nom est requis.');
+  payload.creneaux = creneauxTemp.map(({ id, ...c }) => c);
   await appelJson('/api/campagnes', { method: 'POST', body: JSON.stringify(payload) });
-  alert('Campagne créée.');
+  alert('Campagne créée ✓');
   chargerCampagnes();
 }
+
 async function chargerCampagnes() {
   try {
     const campagnes = await appelJson('/api/campagnes');
     document.getElementById('listeCampagnes').innerHTML = campagnes.map(c => `
       <div class="campagne-item">
-        <b>${c.nom}</b> <span class="badge ${c.statut}">${c.statut}</span><br/>
-        <span class="hint">${c.pays} · ${c.langue} · ${c.sujet || ''} · ordre: ${c.ordre_appel} · fin: ${c.comportement_fin}</span><br/>
-        <span class="hint">${(c.creneaux||[]).map(cr => `${cr.jour} ${cr.heure_debut}-${cr.heure_fin} (min ${cr.appels_min||0}/max ${cr.appels_max||'∞'})`).join(' · ') || 'aucun créneau'}</span>
-        <div class="row">
-          <button class="small vert" onclick="changerStatutCampagne(${c.id},'actif')">Activer</button>
-          <button class="small secondaire" onclick="changerStatutCampagne(${c.id},'pause')">Pause</button>
-          <button class="small danger" onclick="changerStatutCampagne(${c.id},'arrete')">Arrêter</button>
-          <button class="small" onclick="lancerCampagne(${c.id})">Lancer maintenant</button>
+        <div class="camp-titre">${c.nom} <span class="badge ${c.statut}">${c.statut}</span></div>
+        <div class="camp-meta">
+          ${c.pays} · ${c.langue} · ${c.sujet || '—'}<br/>
+          ${(c.creneaux||[]).map(cr => `${cr.jour} ${cr.heure_debut}-${cr.heure_fin} (min ${cr.appels_min||0}/max ${cr.appels_max||'∞'})`).join(' · ') || 'aucun créneau'}
+          · ordre: ${c.ordre_appel} · fin: ${c.comportement_fin}
+        </div>
+        <div class="boutons-camp">
+          <button class="small vert"      onclick="changerStatutCampagne(${c.id},'actif')">▶ Activer</button>
+          <button class="small secondaire" onclick="changerStatutCampagne(${c.id},'pause')">⏸ Pause</button>
+          <button class="small danger"    onclick="arreterCampagne(${c.id})">⏹ Arrêter</button>
+          <button class="small"           onclick="lancerCampagne(${c.id})">🚀 Lancer</button>
+          <button class="small violet"    onclick="ouvrirModifCampagne(${c.id})">✎ Modifier</button>
+          <button class="small rose"      onclick="supprimerCampagne(${c.id}, '${c.nom.replace(/'/g,"\\'")}')">🗑 Supprimer</button>
         </div>
       </div>`).join('') || '<p class="hint">Aucune campagne.</p>';
+
     const options = campagnes.map(c => `<option value="${c.id}">${c.nom}</option>`).join('');
-    ['dashboardCampagneSelect','rapportsCampagneSelect'].forEach(id => { const sel = document.getElementById(id); if (sel) { const v = sel.value; sel.innerHTML = options; if (v) sel.value = v; } });
+    ['dashboardCampagneSelect','rapportsCampagneSelect'].forEach(id => {
+      const sel = document.getElementById(id);
+      if (sel) { const v = sel.value; sel.innerHTML = options; if (v) sel.value = v; }
+    });
     await chargerListes();
-  } catch (e) { /* config pas prête */ }
+  } catch { /* config pas encore prête */ }
 }
-async function changerStatutCampagne(id, statut) { await appelJson(`/api/campagnes/${id}/statut`, { method: 'POST', body: JSON.stringify({ statut }) }); chargerCampagnes(); }
+
+async function changerStatutCampagne(id, statut) {
+  await appelJson(`/api/campagnes/${id}/statut`, { method: 'POST', body: JSON.stringify({ statut }) });
+  chargerCampagnes();
+}
+
+async function arreterCampagne(id) {
+  await appelJson(`/api/campagnes/${id}/statut`, { method: 'POST', body: JSON.stringify({ statut: 'arrete' }) });
+  chargerCampagnes();
+  // Rafraîchir les rapports si on y est
+  if (document.getElementById('vue-rapports').classList.contains('active')) chargerAppels();
+}
+
+async function supprimerCampagne(id, nom) {
+  if (!confirm(`Voulez-vous vraiment supprimer la campagne "${nom}" et ses créneaux ?\n\nLes rapports d'appels sont conservés pour l'historique.`)) return;
+  await appelJson(`/api/campagnes/${id}`, { method: 'DELETE' });
+  chargerCampagnes();
+}
+
 async function lancerCampagne(id, force) {
   try {
     const res = await appelJson(`/api/campagnes/${id}/lancer?limite=5${force ? '&force=1' : ''}`, { method: 'POST' });
     alert('Déclenchés : ' + (res.declenches || []).join(', '));
   } catch (e) {
-    if (e.message.includes('Hors créneau') && confirm(e.message + '\n\nForcer maintenant ?')) return lancerCampagne(id, true);
+    if (e.message.includes('Hors créneau') && confirm(e.message + '\n\nForcer maintenant ?'))
+      return lancerCampagne(id, true);
     alert('Erreur : ' + e.message);
   }
 }
 
-// ---------- Dashboard ----------
+// ─────────────────────────────────────────────────────────────
+// MODIFICATION CAMPAGNE (modale pré-remplie)
+// ─────────────────────────────────────────────────────────────
+let campagneEnCoursDEdit = null;
+
+async function ouvrirModifCampagne(id) {
+  // Charger toutes les campagnes pour trouver celle-ci
+  const campagnes = await appelJson('/api/campagnes');
+  const c = campagnes.find(x => x.id === id);
+  if (!c) return alert('Campagne introuvable.');
+  campagneEnCoursDEdit = id;
+
+  // Pré-remplir tous les champs
+  document.getElementById('editNom').value              = c.nom || '';
+  document.getElementById('editPays').value             = c.pays || 'FR';
+  document.getElementById('editLangue').value           = c.langue || 'fr';
+  document.getElementById('editSujet').value            = c.sujet || '';
+  document.getElementById('editObjectif').value         = c.objectif || '';
+  document.getElementById('editIntro').value            = c.introduction || '';
+  document.getElementById('editPoints').value           = c.points_cles || '';
+  document.getElementById('editMots').value             = c.mots_cles || '';
+  document.getElementById('editEviter').value           = c.sujets_a_eviter || '';
+  document.getElementById('editCapacites').value        = c.capacites_commerciales || '';
+  document.getElementById('editDirectives').value       = c.directives || '';
+  document.getElementById('editRepondeurActif').checked = !!c.repondeur_actif;
+  document.getElementById('editRepondeurMessage').value = c.repondeur_message || '';
+  document.getElementById('editPrestataireVoix').value  = c.prestataire_voix || 'workers-ai';
+  document.getElementById('editOrdreAppel').value       = c.ordre_appel || 'sequentiel';
+  document.getElementById('editComportementFin').value  = c.comportement_fin || 'arret';
+  document.getElementById('editAuto').checked           = !!c.automatisation_active;
+
+  // Charger les listes pour le select
+  const listes = await appelJson('/api/listes');
+  const opts = listes.map(l => `<option value="${l.id}" ${l.id == c.liste_id?'selected':''}>${l.nom}</option>`).join('');
+  document.getElementById('editListe').innerHTML = opts;
+
+  // Créneaux
+  editCreneauxTemp = (c.creneaux || []).map(cr => ({ ...cr, id: cr.id?.toString() || crypto.randomUUID() }));
+  renderCreneauxDans('editCreneauxContainer', editCreneauxTemp, 'majCreneauEdit', 'supprimerLigneCreneauEdit');
+
+  document.getElementById('modalModifCamp').classList.add('active');
+}
+
+function fermerModalModif() {
+  document.getElementById('modalModifCamp').classList.remove('active');
+  campagneEnCoursDEdit = null;
+}
+
+async function sauvegarderModif() {
+  if (!campagneEnCoursDEdit) return;
+  const payload = lireChampsFormulaire('edit');
+  if (!payload.nom) return alert('Le nom est requis.');
+  payload.creneaux = editCreneauxTemp.map(({ id, ...c }) => c);
+  await appelJson(`/api/campagnes/${campagneEnCoursDEdit}`, { method: 'PUT', body: JSON.stringify(payload) });
+  fermerModalModif();
+  chargerCampagnes();
+  alert('Campagne modifiée ✓ — les prochains appels utiliseront les nouveaux paramètres.');
+}
+
+// ─────────────────────────────────────────────────────────────
+// BOARD (dashboard)
+// ─────────────────────────────────────────────────────────────
 function rendreStats(conteneurId, s) {
   const tauxReponse = s.total ? Math.round((s.decroches / s.total) * 100) : 0;
-  // text-shadow néon fin : même couleur que le chiffre, halo léger
   const neon = (hex) => `text-shadow: 0 0 8px ${hex}99, 0 0 18px ${hex}44`;
   document.getElementById(conteneurId).innerHTML = `
-    <div class="stat" style="border-top-color:var(--cyan)"><div class="valeur" style="color:var(--cyan);${neon('#34c8ff')}">${s.total || 0}</div><div class="libelle">Appels lancés</div></div>
-    <div class="stat" style="border-top-color:var(--vert)"><div class="valeur" style="color:var(--vert);${neon('#2ee87a')}">${s.decroches || 0}</div><div class="libelle">Décrochés</div></div>
-    <div class="stat" style="border-top-color:var(--orange)"><div class="valeur" style="color:var(--orange);${neon('#ff9d3d')}">${s.sans_reponse || 0}</div><div class="libelle">Sans réponse</div></div>
-    <div class="stat" style="border-top-color:var(--err)"><div class="valeur" style="color:var(--err);${neon('#ff4d6d')}">${s.echecs || 0}</div><div class="libelle">Échoués</div></div>
-    <div class="stat" style="border-top-color:var(--violet)"><div class="valeur" style="color:var(--violet);${neon('#b758ff')}">${Math.round(s.duree_moyenne || 0)}s</div><div class="libelle">Durée moyenne</div></div>
-    <div class="stat" style="border-top-color:var(--jaune)"><div class="valeur" style="color:var(--jaune);${neon('#ffe34d')}">${s.rdv_pris || 0}</div><div class="libelle">RDV pris</div></div>
-    <div class="stat" style="border-top-color:var(--rose)"><div class="valeur" style="color:var(--rose);${neon('#ff2d9e')}">${tauxReponse}%</div><div class="libelle">Taux de réponse</div></div>
+    <div class="stat" style="border-top-color:var(--cyan)">  <div class="valeur" style="color:var(--cyan);${neon('#34c8ff')}">${s.total||0}</div><div class="libelle">Appels lancés</div></div>
+    <div class="stat" style="border-top-color:var(--vert)">  <div class="valeur" style="color:var(--vert);${neon('#2ee87a')}">${s.decroches||0}</div><div class="libelle">Décrochés</div></div>
+    <div class="stat" style="border-top-color:var(--orange)"><div class="valeur" style="color:var(--orange);${neon('#ff9d3d')}">${s.sans_reponse||0}</div><div class="libelle">Sans réponse</div></div>
+    <div class="stat" style="border-top-color:var(--err)">   <div class="valeur" style="color:var(--err);${neon('#ff4d6d')}">${s.echecs||0}</div><div class="libelle">Échoués</div></div>
+    <div class="stat" style="border-top-color:var(--violet)"><div class="valeur" style="color:var(--violet);${neon('#b758ff')}">${Math.round(s.duree_moyenne||0)}s</div><div class="libelle">Durée moyenne</div></div>
+    <div class="stat" style="border-top-color:var(--jaune)"> <div class="valeur" style="color:var(--jaune);${neon('#ffe34d')}">${s.rdv_pris||0}</div><div class="libelle">RDV pris</div></div>
+    <div class="stat" style="border-top-color:var(--rose)">  <div class="valeur" style="color:var(--rose);${neon('#ff2d9e')}">${tauxReponse}%</div><div class="libelle">Taux de réponse</div></div>
   `;
 }
-async function chargerDashboard() { await chargerCampagnes(); rendreStats('statsGlobales', await appelJson('/api/stats')); if (document.getElementById('dashboardCampagneSelect').value) chargerStatsCampagne(); }
-async function chargerStatsCampagne() { const id = document.getElementById('dashboardCampagneSelect').value; if (id) rendreStats('statsCampagne', await appelJson(`/api/campagnes/${id}/stats`)); }
 
-// ---------- Rapports ----------
+async function chargerDashboard() {
+  await chargerCampagnes();
+  rendreStats('statsGlobales', await appelJson('/api/stats'));
+  if (document.getElementById('dashboardCampagneSelect').value) chargerStatsCampagne();
+}
+
+async function chargerStatsCampagne() {
+  const id = document.getElementById('dashboardCampagneSelect').value;
+  if (id) rendreStats('statsCampagne', await appelJson(`/api/campagnes/${id}/stats`));
+}
+
+// ─────────────────────────────────────────────────────────────
+// RAPPORTS
+// ─────────────────────────────────────────────────────────────
 async function chargerAppels() {
   const id = document.getElementById('rapportsCampagneSelect').value;
   if (!id) return;
   const appels = await appelJson(`/api/campagnes/${id}/appels`);
   document.getElementById('appelsBody').innerHTML = appels.length ? appels.map(a => `
     <tr class="cliquable" onclick="ouvrirAppel('${a.call_uuid}')">
-      <td>${a.phone}</td><td>${a.pays || ''}</td><td><span class="badge ${a.statut}">${a.statut}</span></td>
-      <td>${a.rdv_pris ? '<span class="badge rdv">RDV</span>' : ''}</td><td>${a.duree_secondes}s</td>
+      <td>${a.phone}</td>
+      <td><span class="badge ${a.statut}">${a.statut}</span></td>
+      <td>${a.rdv_pris ? '<span class="badge rdv">RDV</span>' : ''}</td>
+      <td>${a.duree_secondes}s</td>
+      <td>${a.statut === 'en_cours'
+        ? `<button class="small orange" onclick="event.stopPropagation();cloturerAppel('${a.call_uuid}')">Clôturer</button>`
+        : ''}</td>
     </tr>`).join('') : '<tr><td colspan="5" class="hint">Aucun appel.</td></tr>';
 }
+
+async function cloturerAppel(callUuid) {
+  if (!confirm('Clôturer cet appel bloqué et le passer en "annulé" ?')) return;
+  await appelJson(`/api/appels/${callUuid}/cloturer`, { method: 'POST' });
+  chargerAppels();
+}
+
+async function nettoyerBlockes() {
+  const res = await appelJson('/api/maintenance/nettoyer', { method: 'POST' });
+  alert(`${res.nettoyes} appel(s) bloqué(s) clôturé(s).`);
+  chargerAppels();
+}
+
 async function exporterCsv() {
   const id = document.getElementById('rapportsCampagneSelect').value;
   if (!id) return alert('Sélectionne une campagne.');
   const { url, key } = cfg();
   window.open(`${url}/api/campagnes/${id}/export?key=${encodeURIComponent(key)}`, '_blank');
 }
+
 async function ouvrirAppel(callUuid) {
   const a = await appelJson(`/api/appels/${callUuid}`);
-  const transcript = (a.transcription || []).map(t => `<div class="transcript-line ${t.role}">${t.role === 'agent' ? '🟦 Agent' : '🟩 Prospect'} — ${t.texte}</div>`).join('') || '<span class="hint">Pas encore de transcription.</span>';
+  const transcript = (a.transcription || []).map(t =>
+    `<div class="transcript-line ${t.role}">${t.role==='agent'?'🟦 Agent':'🟩 Prospect'} — ${t.texte}</div>`
+  ).join('') || '<span class="hint">Pas de transcription.</span>';
   document.getElementById('modalAppelContenu').innerHTML = `
     <h3>${a.phone} ${a.rdv_pris ? '<span class="badge rdv">RDV PRIS</span>' : ''}</h3>
-    <div class="modal-section"><b>Statut</b> ${a.statut} ${a.repondeur_detecte ? '(répondeur détecté)' : ''}</div>
-    <div class="modal-section"><b>Pays / Langue</b> ${a.pays || ''} / ${a.langue || ''}</div>
-    <div class="modal-section"><b>Durée</b> ${a.duree_secondes}s — ${a.tours} tour(s)</div>
-    <div class="modal-section"><b>Résultat</b> ${a.resultat || '—'}</div>
-    <div class="modal-section"><b>Résumé</b> ${a.resume_ia || '—'}</div>
-    <div class="modal-section"><b>Points forts</b> ${a.points_forts || '—'}</div>
-    <div class="modal-section"><b>Points importants</b> ${a.points_importants || '—'}</div>
-    <div class="modal-section"><b>Objections</b> ${a.objections || '—'}</div>
-    <div class="modal-section"><b>Infos utiles</b> ${a.infos_utiles || '—'}</div>
-    <div class="modal-section"><b>Transcription complète</b>${transcript}</div>
+    <div class="modal-section"><b>Statut</b>${a.statut} ${a.repondeur_detecte?'(répondeur)':''}</div>
+    <div class="modal-section"><b>Pays / Langue</b>${a.pays||''} / ${a.langue||''}</div>
+    <div class="modal-section"><b>Durée</b>${a.duree_secondes}s — ${a.tours} tour(s)</div>
+    <div class="modal-section"><b>Résultat</b>${a.resultat||'—'}</div>
+    <div class="modal-section"><b>Résumé</b>${a.resume_ia||'—'}</div>
+    <div class="modal-section"><b>Points forts</b>${a.points_forts||'—'}</div>
+    <div class="modal-section"><b>Points importants</b>${a.points_importants||'—'}</div>
+    <div class="modal-section"><b>Objections</b>${a.objections||'—'}</div>
+    <div class="modal-section"><b>Infos utiles</b>${a.infos_utiles||'—'}</div>
+    <div class="modal-section"><b>Transcription</b>${transcript}</div>
+    ${a.statut==='en_cours'?`<button class="orange" onclick="cloturerAppel('${callUuid}');fermerModal()">Clôturer cet appel bloqué</button>`:''}
     <button class="secondaire" onclick="fermerModal()">Fermer</button>`;
   document.getElementById('modalAppel').classList.add('active');
 }
+
 function fermerModal() { document.getElementById('modalAppel').classList.remove('active'); }
 
-// ---------- Notes ----------
-function echapperHtml(s) { return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
-function linkify(texte) { return texte.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>'); }
+// ─────────────────────────────────────────────────────────────
+// NOTES
+// ─────────────────────────────────────────────────────────────
+function echapperHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function linkify(texte)   { return texte.replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>'); }
 
 async function ajouterNote() {
   const champ = document.getElementById('nouvelleNote');
   const texte = champ.value.trim();
-  if (!texte) return alert('Écris un texte avant de cliquer sur Ajouter.');
+  if (!texte) return alert('Écris un texte avant d\'ajouter.');
   try {
-    await appelJson('/api/notes', { method: 'POST', body: JSON.stringify({ texte }) });
+    await appelJson('/api/notes', { method:'POST', body:JSON.stringify({texte}) });
     champ.value = '';
     chargerNotes();
-  } catch (e) { alert('Erreur lors de l\'ajout : ' + e.message); }
+  } catch(e) { alert('Erreur : '+e.message); }
 }
 
 async function chargerNotes() {
   const notes = await appelJson('/api/notes');
-  // Le titre est stocké dans la 1ère ligne du texte si elle commence par "# "
-  // sinon on affiche juste "(sans titre)" modifiable.
   document.getElementById('listeNotes').innerHTML = notes.map(n => {
     const lignes = n.texte.split('\n');
     const aTitre = lignes[0].startsWith('# ');
-    const titre   = aTitre ? lignes[0].slice(2).trim() : '';
-    const corps   = aTitre ? lignes.slice(1).join('\n').trim() : n.texte;
-    return `
-    <div class="carte-note">
-      <input class="note-titre-edit" id="note-titre-${n.id}"
-             value="${echapperHtml(titre)}" placeholder="Titre de la note (optionnel)" />
+    const titre  = aTitre ? lignes[0].slice(2).trim() : '';
+    const corps  = aTitre ? lignes.slice(1).join('\n').trim() : n.texte;
+    return `<div class="carte-note">
+      <input class="note-titre-edit" id="note-titre-${n.id}" value="${echapperHtml(titre)}" placeholder="Titre (optionnel)" />
       <div class="note-rendu">${linkify(echapperHtml(corps))}</div>
       <textarea class="note-edit" id="note-edit-${n.id}" rows="3">${echapperHtml(corps)}</textarea>
       <hr />
       <div class="pied-carte">
-        <span class="date-maj">Modifié ${n.updated_at}${n.updated_at === n.created_at ? '' : `<br/>Créée ${n.created_at}`}</span>
+        <span class="date-maj">Modifié ${n.updated_at}${n.updated_at===n.created_at?'':'<br/>Créée '+n.created_at}</span>
         <div class="actions-carte">
           <button class="btn-sauvegarder" onclick="enregistrerNote(${n.id})">💾 Sauvegarder</button>
-          <button class="btn-supprimer" onclick="supprimerNote(${n.id})">Supprimer</button>
+          <button class="btn-supprimer"   onclick="supprimerNote(${n.id})">Supprimer</button>
         </div>
       </div>
     </div>`;
-  }).join('') || '<p class="hint">Aucune note pour l\'instant.</p>';
+  }).join('') || '<p class="hint">Aucune note.</p>';
 }
 
 async function enregistrerNote(id) {
-  const titre = (document.getElementById(`note-titre-${id}`)?.value || '').trim();
-  const corps = (document.getElementById(`note-edit-${id}`)?.value || '').trim();
-  if (!corps) return alert('Le contenu de la note ne peut pas être vide.');
-  // Stockage : "# Titre\nCorps" si titre présent, sinon juste le corps
+  const titre = (document.getElementById(`note-titre-${id}`)?.value||'').trim();
+  const corps = (document.getElementById(`note-edit-${id}`)?.value||'').trim();
+  if (!corps) return alert('Le contenu ne peut pas être vide.');
   const texte = titre ? `# ${titre}\n${corps}` : corps;
   try {
-    await appelJson(`/api/notes/${id}`, { method: 'PUT', body: JSON.stringify({ texte }) });
+    await appelJson(`/api/notes/${id}`, { method:'PUT', body:JSON.stringify({texte}) });
     chargerNotes();
-  } catch (e) { alert('Erreur lors de l\'enregistrement : ' + e.message); }
-}
-async function supprimerNote(id) {
-  try { await appel(`/api/notes/${id}`, { method: 'DELETE' }); chargerNotes(); }
-  catch (e) { alert('Erreur : ' + e.message); }
+  } catch(e) { alert('Erreur : '+e.message); }
 }
 
-// ---------- Liens (compacts) ----------
+async function supprimerNote(id) {
+  try { await appel(`/api/notes/${id}`, { method:'DELETE' }); chargerNotes(); }
+  catch(e) { alert('Erreur : '+e.message); }
+}
+
+// ─────────────────────────────────────────────────────────────
+// LIENS (compacts)
+// ─────────────────────────────────────────────────────────────
 function extraireDomaine(u) {
   try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return u; }
 }
@@ -734,22 +967,21 @@ function extraireDomaine(u) {
 async function ajouterLien() {
   const libelle  = document.getElementById('nouveauLienLibelle').value.trim();
   const lien_url = document.getElementById('nouveauLienUrl').value.trim();
-  if (!lien_url) return alert('Renseigne une URL avant de cliquer sur Ajouter.');
+  if (!lien_url) return alert('URL requise.');
   try {
-    await appelJson('/api/liens', { method: 'POST', body: JSON.stringify({ libelle, lien_url }) });
+    await appelJson('/api/liens', { method:'POST', body:JSON.stringify({libelle, lien_url}) });
     document.getElementById('nouveauLienLibelle').value = '';
     document.getElementById('nouveauLienUrl').value     = '';
     chargerLiens();
-  } catch (e) { alert("Erreur lors de l'ajout : " + e.message); }
+  } catch(e) { alert('Erreur : '+e.message); }
 }
 
 async function chargerLiens() {
   const liens = await appelJson('/api/liens');
   document.getElementById('listeLiens').innerHTML = liens.map(l => `
     <div class="lien-ligne">
-      <a class="lien-ouvrir" href="${echapperHtml(l.url)}" target="_blank" rel="noopener"
-         title="${echapperHtml(l.url)}">
-        🔗 ${echapperHtml(l.libelle || extraireDomaine(l.url))}
+      <a class="lien-ouvrir" href="${echapperHtml(l.url)}" target="_blank" rel="noopener" title="${echapperHtml(l.url)}">
+        🔗 ${echapperHtml(l.libelle||extraireDomaine(l.url))}
       </a>
       <span class="lien-domaine">${echapperHtml(extraireDomaine(l.url))}</span>
       <div class="lien-actions">
@@ -758,15 +990,13 @@ async function chargerLiens() {
       </div>
     </div>
     <div class="lien-edit-form" id="lien-form-${l.id}">
-      <label>Libellé</label>
-      <input id="lien-libelle-${l.id}" value="${echapperHtml(l.libelle || '')}" placeholder="Nom affiché" />
-      <label>URL</label>
-      <input id="lien-url-${l.id}" value="${echapperHtml(l.url)}" placeholder="https://..." />
+      <label>Libellé</label><input id="lien-libelle-${l.id}" value="${echapperHtml(l.libelle||'')}" placeholder="Nom affiché" />
+      <label>URL</label><input id="lien-url-${l.id}" value="${echapperHtml(l.url)}" placeholder="https://..." />
       <div style="display:flex;gap:8px;margin-top:8px;">
         <button class="btn-sauvegarder small" style="width:auto;" onclick="enregistrerLien(${l.id})">💾 Sauvegarder</button>
         <button class="secondaire small" onclick="toggleEditLien(${l.id})">Annuler</button>
       </div>
-    </div>`).join('') || '<p class="hint">Aucun lien pour l\'instant.</p>';
+    </div>`).join('') || '<p class="hint">Aucun lien.</p>';
 }
 
 function toggleEditLien(id) {
@@ -775,19 +1005,19 @@ function toggleEditLien(id) {
 }
 
 async function enregistrerLien(id) {
-  const libelle  = (document.getElementById(`lien-libelle-${id}`)?.value || '').trim();
-  const lien_url = (document.getElementById(`lien-url-${id}`)?.value || '').trim();
+  const libelle  = (document.getElementById(`lien-libelle-${id}`)?.value||'').trim();
+  const lien_url = (document.getElementById(`lien-url-${id}`)?.value||'').trim();
   if (!lien_url) return alert('URL requise.');
   try {
-    await appelJson(`/api/liens/${id}`, { method: 'PUT', body: JSON.stringify({ libelle, lien_url }) });
+    await appelJson(`/api/liens/${id}`, { method:'PUT', body:JSON.stringify({libelle, lien_url}) });
     chargerLiens();
-  } catch (e) { alert("Erreur lors de l'enregistrement : " + e.message); }
+  } catch(e) { alert('Erreur : '+e.message); }
 }
+
 async function supprimerLien(id) {
-  try { await appel(`/api/liens/${id}`, { method: 'DELETE' }); chargerLiens(); }
-  catch (e) { alert('Erreur : ' + e.message); }
+  try { await appel(`/api/liens/${id}`, { method:'DELETE' }); chargerLiens(); }
+  catch(e) { alert('Erreur : '+e.message); }
 }
 </script>
-
 </body>
 </html>
