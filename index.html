@@ -605,12 +605,33 @@ async function chargerListes() {
     <div class="liste-item">
       <b>${l.nom}</b><br/>
       <span class="hint">${l.nb_contacts} contact(s) · ${l.nb_a_appeler} à appeler</span>
+      <div style="margin-top:6px;">
+        <button class="small danger" onclick="supprimerListe(${l.id}, '${l.nom.replace(/'/g,"\\'")}')">🗑 Supprimer</button>
+      </div>
     </div>`).join('') || '<p class="hint">Aucune liste.</p>';
   const options = listes.map(l => `<option value="${l.id}">${l.nom} (${l.nb_contacts})</option>`).join('');
   ['listeSelectImport','campListe','editListe'].forEach(id => {
     const sel = document.getElementById(id);
     if (sel) { const v = sel.value; sel.innerHTML = options; if (v) sel.value = v; }
   });
+}
+
+async function supprimerListe(id, nom) {
+  if (!confirm(`Supprimer la liste "${nom}" et tous ses contacts ?\n\nAttention : cette action est irréversible.`)) return;
+  try {
+    const res = await appelJson(`/api/listes/${id}`, { method: 'DELETE' });
+    if (res.ok) { chargerListes(); }
+  } catch(e) {
+    // Si la liste est utilisée par des campagnes, l'API renvoie 409 avec le détail
+    try {
+      const data = JSON.parse(e.message);
+      if (data.campagnes) {
+        alert(`Impossible de supprimer : cette liste est utilisée par :\n${data.campagnes.map(c => `- ${c.nom}`).join('\n')}\n\nSupprime ou modifie ces campagnes d'abord.`);
+      } else {
+        alert('Erreur : ' + e.message);
+      }
+    } catch { alert('Erreur : ' + e.message); }
+  }
 }
 
 function parserTextePaste(texte) {
