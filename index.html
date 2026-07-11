@@ -567,22 +567,28 @@ function renderCreneauxDans(conteneurId, liste, prefixFn, supprimerFn) {
         <div style="flex:1;"><label style="margin:0 0 2px;">Min/jour</label>
           <input type="number" min="0" value="${c.appels_min||0}" onchange="${prefixFn}('${c.id}','appels_min',parseInt(this.value||0))" />
         </div>
-        <div style="flex:1;"><label style="margin:0 0 2px;">Max (0=illimité)</label>
+        <div style="flex:1;"><label style="margin:0 0 2px;">Max/jour (0=∞)</label>
           <input type="number" min="0" value="${c.appels_max||0}" onchange="${prefixFn}('${c.id}','appels_max',parseInt(this.value||0))" />
         </div>
+        <div style="flex:1;"><label style="margin:0 0 2px;">Appels/heure (0=∞)</label>
+          <input type="number" min="0" value="${c.appels_par_heure||0}" onchange="${prefixFn}('${c.id}','appels_par_heure',parseInt(this.value||0))" />
+        </div>
       </div>
+      <p style="font-size:10px;color:var(--texte-dim);margin:4px 0 0;">
+        Ex : samedi 18h-22h · 2 appels/heure → l'automatisation appelle 2 numéros par heure sur ce créneau.
+      </p>
     </div>`).join('');
 }
 
 function ajouterLigneCreneau() {
-  creneauxTemp.push({ id: crypto.randomUUID(), jour:'lundi', heure_debut:'09:00', heure_fin:'18:00', fuseau:'Europe/Paris', appels_min:0, appels_max:0 });
+  creneauxTemp.push({ id: crypto.randomUUID(), jour:'lundi', heure_debut:'09:00', heure_fin:'18:00', fuseau:'Europe/Paris', appels_min:0, appels_max:0, appels_par_heure:0 });
   renderCreneauxDans('creneauxContainer', creneauxTemp, 'majCreneau', 'supprimerLigneCreneau');
 }
 function supprimerLigneCreneau(id) { creneauxTemp = creneauxTemp.filter(c => c.id !== id); renderCreneauxDans('creneauxContainer', creneauxTemp, 'majCreneau', 'supprimerLigneCreneau'); }
 function majCreneau(id, champ, valeur) { const c = creneauxTemp.find(c => c.id === id); if (c) c[champ] = valeur; }
 
 function ajouterLigneCreneauEdit() {
-  editCreneauxTemp.push({ id: crypto.randomUUID(), jour:'lundi', heure_debut:'09:00', heure_fin:'18:00', fuseau:'Europe/Paris', appels_min:0, appels_max:0 });
+  editCreneauxTemp.push({ id: crypto.randomUUID(), jour:'lundi', heure_debut:'09:00', heure_fin:'18:00', fuseau:'Europe/Paris', appels_min:0, appels_max:0, appels_par_heure:0 });
   renderCreneauxDans('editCreneauxContainer', editCreneauxTemp, 'majCreneauEdit', 'supprimerLigneCreneauEdit');
 }
 function supprimerLigneCreneauEdit(id) { editCreneauxTemp = editCreneauxTemp.filter(c => c.id !== id); renderCreneauxDans('editCreneauxContainer', editCreneauxTemp, 'majCreneauEdit', 'supprimerLigneCreneauEdit'); }
@@ -641,15 +647,35 @@ function parserTextePaste(texte) {
   });
 }
 
+const CHUNK_FRONT = 5000; // contacts envoyés par requête API (Worker les traite par 500)
+
 async function importerCsv() {
   const id = document.getElementById('listeSelectImport').value;
   if (!id) return alert('Sélectionne une liste.');
   const langue_defaut = document.getElementById('listeLangueDefaut').value;
   const contacts = parserTextePaste(document.getElementById('contactsCsv').value);
-  const res = await appelJson(`/api/listes/${id}/contacts`, { method: 'POST', body: JSON.stringify({ contacts, langue_defaut }) });
-  alert(res.importes + ' contact(s) importé(s).');
+  if (!contacts.length) return alert('Aucun numéro valide trouvé.');
+  const total = await importerChunks(id, contacts, langue_defaut);
+  alert(`✓ ${total} contact(s) importé(s).`);
   document.getElementById('contactsCsv').value = '';
   chargerListes();
+}
+
+async function importerChunks(listeId, contacts, langue_defaut) {
+  let totalImportes = 0;
+  for (let i = 0; i < contacts.length; i += CHUNK_FRONT) {
+    const chunk = contacts.slice(i, i + CHUNK_FRONT);
+    const res = await appelJson(`/api/listes/${listeId}/contacts`, {
+      method: 'POST', body: JSON.stringify({ contacts: chunk, langue_defaut })
+    });
+    totalImportes += res.importes || 0;
+    // Afficher la progression dans le titre de la page si import long
+    const pct = Math.round(((i + chunk.length) / contacts.length) * 100);
+    document.title = `Import ${pct}% — PGI Phoning Center Pro`;
+    if (pct % 10 === 0) console.log(`[IMPORT] ${pct}% — ${totalImportes} importés`);
+  }
+  document.title = 'PGI • Phoning Center Pro';
+  return totalImportes;
 }
 
 async function importerFichier() {
@@ -660,10 +686,12 @@ async function importerFichier() {
   if (!fichier) return alert('Choisis un fichier.');
   const classeur = XLSX.read(await fichier.arrayBuffer());
   const lignes = XLSX.utils.sheet_to_json(classeur.Sheets[classeur.SheetNames[0]], { header: 1 });
-  const contacts = lignes.filter(l => l[0] && String(l[0]).trim().startsWith('+'))
+  const contacts = lignes
+    .filter(l => l[0] && String(l[0]).trim().startsWith('+'))
     .map(l => ({ phone: String(l[0]).trim(), prenom: l[1]||null, nom: l[2]||null, pays: l[3]||null, langue: l[4]||null, notes: l[5]||null }));
-  const res = await appelJson(`/api/listes/${id}/contacts`, { method: 'POST', body: JSON.stringify({ contacts, langue_defaut }) });
-  alert(res.importes + ' contact(s) importé(s).');
+  if (!contacts.length) return alert('Aucun numéro valide trouvé dans le fichier.');
+  const t = await importerChunks(id, contacts, langue_defaut);
+  alert(`✓ ${t} contact(s) importé(s) depuis le fichier.`);
   chargerListes();
 }
 
