@@ -38,6 +38,7 @@
   .puce { font-size: 10px; padding: 3px 8px; border-radius: 10px; border: 1px solid var(--border); color: var(--texte-dim); background: #00000033; }
   .puce.ok  { color: var(--vert);  border-color: var(--vert);  box-shadow: 0 0 6px #2ee87a55; }
   .puce.off { color: var(--err);   border-color: var(--err); }
+  .puce.info { color: var(--cyan); border-color: var(--cyan); }
 
   main { padding: 14px; max-width: 920px; margin: 0 auto; }
   .vue { display: none; }
@@ -55,14 +56,17 @@
     margin: 0 0 12px; font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 800;
     color: #ff7fd0; text-shadow: 0 0 5px #ff2d9eaa, 0 0 12px #ff2d9e44;
   }
+  .panel h2 small { display:block; font-size:9px; letter-spacing:0.5px; text-transform:none; color:var(--texte-dim); text-shadow:none; margin-top:2px; font-weight:500; }
 
   label { display: block; font-size: 12px; color: var(--texte-dim); margin: 10px 0 4px; }
   input, textarea, select { width: 100%; background: #16181b; border: 1px solid var(--border); color: var(--texte); padding: 10px; border-radius: 6px; font-size: 14px; font-family: inherit; }
   input[type=checkbox] { width: auto; display: inline-block; vertical-align: middle; }
+  input:disabled, select:disabled, input[readonly] { opacity: .6; cursor: not-allowed; }
   input:focus, textarea:focus, select:focus { outline: none; border-color: var(--cyan); box-shadow: 0 0 6px #34c8ff55; }
 
   button { background: transparent; border: 1px solid var(--cyan); color: var(--cyan); padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; text-transform: uppercase; letter-spacing: .5px; margin-top: 10px; width: 100%; font-weight: 700; }
   button:active { background: var(--cyan); color: #001016; }
+  button:disabled { opacity: .5; cursor: not-allowed; }
   button.secondaire  { border-color: var(--texte-dim); color: var(--texte-dim); }
   button.danger      { border-color: var(--err);    color: var(--err); }
   button.vert        { border-color: var(--vert);   color: var(--vert); }
@@ -71,9 +75,11 @@
   button.rose        { border-color: var(--rose);   color: var(--rose); }
   button.small { width: auto; padding: 6px 10px; font-size: 11px; margin: 4px 4px 0 0; }
 
-  .row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items:center; }
   .row > * { flex: 1; min-width: 110px; }
   .hint { font-size: 11px; color: var(--texte-dim); margin-top: 6px; line-height: 1.5; }
+  .erreur-msg { font-size: 12px; color: var(--err); background:#ff4d6d18; border:1px solid var(--err); border-radius:6px; padding:8px 10px; margin-top:8px; }
+  .succes-msg { font-size: 12px; color: var(--ok); background:#2ee87a18; border:1px solid var(--ok); border-radius:6px; padding:8px 10px; margin-top:8px; }
   .creneau-bloc { background: var(--panel2); border-radius: 8px; padding: 10px; margin-bottom: 8px; }
   .creneau-ligne { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; flex-wrap: wrap; }
   .creneau-ligne select, .creneau-ligne input { flex: 1; min-width: 90px; }
@@ -83,18 +89,24 @@
   .badge.pause, .badge.en_cours { background: #ffb02e22; color: var(--warn); }
   .badge.arrete, .badge.echoue, .badge.sans_reponse, .badge.occupe,
   .badge.annule, .badge.timeout, .badge.erreur { background: #ff4d6d22; color: var(--err); }
-  .badge.rdv { background: #ffe34d22; color: var(--jaune); }
+  .badge.oui { background:#2ee87a22; color:var(--ok); }
+  .badge.non { background:#8b94a022; color:var(--texte-dim); }
 
   table { width: 100%; border-collapse: collapse; font-size: 12px; }
   th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--border); }
   th { color: var(--texte-dim); text-transform: uppercase; font-size: 9px; }
   tr.cliquable { cursor: pointer; }
   tr.cliquable:active { background: var(--panel2); }
+  .table-scroll { overflow-x: auto; }
 
   .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .stat { background: var(--panel2); border-radius: 8px; padding: 14px; text-align: center; border-top: 3px solid var(--border); }
-  .stat .valeur  { font-size: 26px; font-weight: 500; }
-  .stat .libelle { font-size: 10px; color: var(--texte-dim); text-transform: uppercase; margin-top: 4px; letter-spacing: .5px; }
+  .stat { background: var(--panel2); border-radius: 8px; padding: 12px 8px; text-align: center; border-top: 3px solid var(--border); }
+  .stat .valeur  { font-size: 22px; font-weight: 600; }
+  .stat .libelle { font-size: 9px; color: var(--texte-dim); text-transform: uppercase; margin-top: 4px; letter-spacing: .4px; line-height:1.3; }
+
+  .pagination { display:flex; gap:8px; align-items:center; justify-content:center; margin-top:10px; flex-wrap:wrap; }
+  .pagination button { width:auto; margin:0; padding:6px 14px; }
+  .pagination span { font-size:11px; color:var(--texte-dim); }
 
   .carte-note { background: var(--panel2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 14px; }
   .carte-note .note-titre-edit { background: transparent; border: none; border-bottom: 1px dashed var(--border); color: #ff7fd0; font-weight: 800; font-size: 14px; width: 100%; margin-bottom: 8px; padding: 2px 0; }
@@ -127,12 +139,12 @@
   .campagne-item .boutons-camp button { width: auto; margin: 0; padding: 6px 12px; font-size: 11px; }
 
   .liste-item { background: var(--panel2); border-radius: 8px; padding: 10px; margin-bottom: 8px; border-left: 3px solid var(--orange); }
+  .liste-item .liste-actions { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
 
   nav.tabs { position: fixed; bottom: 0; left: 0; right: 0; display: flex; background: #14161a; border-top: 1px solid var(--border); z-index: 10; }
   nav.tabs button { flex: 1; background: none; border: none; padding: 7px 2px 8px; font-size: 9px; text-transform: uppercase; margin: 0; border-radius: 0; font-weight: 700; opacity: .55; display: flex; flex-direction: column; align-items: center; gap: 2px; }
   nav.tabs button .icone { font-size: 16px; line-height: 1; }
   nav.tabs button.active { opacity: 1; text-shadow: 0 0 8px currentColor; }
-  /* Ordre : Campagnes(1) Contacts(2) Rapports(3) Board(4) Notes(5) Liens(6) Config(7) */
   nav.tabs button:nth-child(1) { color: var(--violet); }
   nav.tabs button:nth-child(2) { color: var(--orange); }
   nav.tabs button:nth-child(3) { color: var(--rose); }
@@ -151,9 +163,11 @@
   .transcript-line.agent   { color: var(--cyan); }
   .transcript-line.prospect { color: var(--vert); }
 
-  /* Formulaire de modification campagne (modal) */
   .modal-camp { background: var(--panel); border: 1px solid var(--violet); border-radius: 10px; padding: 18px; max-width: 640px; width: 100%; max-height: 90vh; overflow-y: auto; }
   .modal-camp h3 { margin-top: 0; color: #c490ff; }
+
+  .astuce-box { background:#0f2e26; border:1px solid var(--turquoise); border-radius:8px; padding:12px; font-size:12px; line-height:1.7; color:#bdf5ea; }
+  .astuce-box b { color: var(--turquoise); }
 </style>
 </head>
 <body>
@@ -200,27 +214,27 @@
       </div>
       <label>Sujet</label>
       <input id="campSujet" placeholder="Ex: Voyance, Pièces automobiles..." />
-      <label>Objectif final</label>
+      <label>Objectif final <span class="hint" style="display:inline;">(utilisé si l'introduction est vide)</span></label>
       <textarea id="campObjectif" rows="2"></textarea>
-      <label>Introduction</label>
-      <textarea id="campIntro" rows="2"></textarea>
-      <label>Points clés (un par ligne)</label>
-      <textarea id="campPoints" rows="3"></textarea>
+      <label>Introduction — <b>message lu tel quel si un humain décroche</b></label>
+      <textarea id="campIntro" rows="3" placeholder="Ex: Bonjour, je vous appelle au sujet de..."></textarea>
+      <p class="hint">⚠️ Mode message unique : ce texte est lu <b>exactement tel quel</b> par Telnyx, sans reformulation ni IA. Rédige-le comme la phrase finale que le prospect entendra.</p>
+      <label>Points clés (un par ligne) <span class="hint" style="display:inline;">— conservé pour référence, non lu automatiquement</span></label>
+      <textarea id="campPoints" rows="2"></textarea>
       <label>Mots-clés (séparés par des virgules)</label>
       <input id="campMots" />
       <label>Sujets à éviter (un par ligne)</label>
       <textarea id="campEviter" rows="2"></textarea>
       <label>Capacités commerciales</label>
-      <textarea id="campCapacites" rows="3"></textarea>
+      <textarea id="campCapacites" rows="2"></textarea>
       <label>Directives comportementales</label>
-      <textarea id="campDirectives" rows="3"></textarea>
-      <label><input type="checkbox" id="campRepondeurActif" /> Laisser un message si répondeur détecté</label>
-      <textarea id="campRepondeurMessage" rows="2" placeholder="Message lu si répondeur"></textarea>
-      <label>Prestataire vocal</label>
-      <select id="campPrestataireVoix">
-        <option value="workers-ai">Cloudflare Workers AI (gratuit — FR/EN/ES)</option>
-        <option value="elevenlabs">ElevenLabs (payant — toutes langues)</option>
-      </select>
+      <textarea id="campDirectives" rows="2"></textarea>
+      <label><input type="checkbox" id="campRepondeurActif" checked /> Message répondeur distinct</label>
+      <p class="hint">Le détecteur de répondeur (AMD Telnyx) est <b>toujours activé</b> sur tous les appels, quelle que soit cette case. Elle sert uniquement à indiquer si le message ci-dessous doit être utilisé lorsqu'un répondeur est détecté (sinon l'introduction sera relue).</p>
+      <label>Message répondeur — <b>lu tel quel après le bip</b></label>
+      <textarea id="campRepondeurMessage" rows="3" placeholder="Message lu après le bip du répondeur"></textarea>
+      <input type="hidden" id="campPrestataireVoix" value="telnyx" />
+      <p class="hint">🔊 Voix : Telnyx speak natif (aucun autre moteur vocal n'est utilisé en mode message unique).</p>
       <div class="row">
         <div>
           <label>Ordre des appels</label>
@@ -242,6 +256,7 @@
       <button type="button" class="secondaire small" onclick="ajouterLigneCreneau()">+ Ajouter un créneau</button>
       <label><input type="checkbox" id="campAuto" /> Activer l'automatisation</label>
       <button class="violet" onclick="creerCampagne()">Créer la campagne</button>
+      <div id="campagneMsg"></div>
     </div>
 
     <div class="panel c-violet">
@@ -253,11 +268,19 @@
   <!-- CONTACTS -->
   <section class="vue" id="vue-listes">
     <div class="panel c-orange">
+      <h2>Vue d'ensemble contacts</h2>
+      <div class="stats-grid" id="statsContactsGlobal"></div>
+      <p class="hint" id="statsContactsNote"></p>
+    </div>
+
+    <div class="panel c-orange">
       <h2>Créer une liste de contacts</h2>
       <label>Nom de la liste</label>
       <input id="listeNom" placeholder="Ex: Prospects voyance France" />
       <button class="orange" onclick="creerListe()">Créer la liste</button>
+      <div id="listeMsg"></div>
     </div>
+
     <div class="panel c-orange">
       <h2>Importer dans une liste</h2>
       <label>Liste cible</label>
@@ -271,14 +294,38 @@
       </select>
       <label>Coller une liste (téléphone,prénom,nom,pays,langue — ou juste le numéro)</label>
       <textarea id="contactsCsv" rows="5" placeholder="+33612345678,Jean,Dupont&#10;+14155552671&#10;+393331234567,Maria,Rossi"></textarea>
-      <button onclick="importerCsv()">Importer le texte collé</button>
+      <button onclick="importerCsv()" id="btnImportCsv">Importer le texte collé</button>
       <label>Fichier Excel (.xlsx) ou CSV</label>
       <input type="file" id="fichierImport" accept=".xlsx,.xls,.csv" />
-      <button class="secondaire" onclick="importerFichier()">Importer le fichier</button>
+      <button class="secondaire" onclick="importerFichier()" id="btnImportFichier">Importer le fichier</button>
       <label>URL Google Sheet publiée en CSV</label>
       <input id="urlGoogleSheet" placeholder="https://docs.google.com/.../pub?output=csv" />
-      <button class="secondaire" onclick="importerDepuisUrl()">Importer depuis l'URL</button>
+      <button class="secondaire" onclick="importerDepuisUrl()" id="btnImportUrl">Importer depuis l'URL</button>
+      <div id="importMsg"></div>
     </div>
+
+    <div class="panel c-orange">
+      <h2>Contacts d'une liste</h2>
+      <label>Liste à consulter</label>
+      <select id="listeSelectView" onchange="afficherContactsListe(this.value, 1)"></select>
+      <div class="row" style="margin-top:6px;">
+        <select id="filtreStatutContact" onchange="afficherContactsListe(document.getElementById('listeSelectView').value, 1)">
+          <option value="">Tous les statuts</option>
+          <option value="a_appeler">À appeler</option>
+          <option value="en_cours">En cours</option>
+          <option value="appele">Appelé</option>
+        </select>
+        <button class="secondaire small" style="margin:0;" onclick="afficherContactsListe(document.getElementById('listeSelectView').value, contactsPageCourante)">🔄 Rafraîchir</button>
+      </div>
+      <div class="table-scroll">
+        <table style="margin-top:10px;">
+          <thead><tr><th>Téléphone</th><th>Prénom</th><th>Nom</th><th>Pays</th><th>Langue</th><th>Statut</th></tr></thead>
+          <tbody id="contactsBody"><tr><td colspan="6" class="hint">Sélectionne une liste ci-dessus.</td></tr></tbody>
+        </table>
+      </div>
+      <div class="pagination" id="contactsPagination"></div>
+    </div>
+
     <div class="panel c-orange">
       <h2>Listes existantes</h2>
       <div id="listeListes"></div>
@@ -288,24 +335,47 @@
   <!-- RAPPORTS -->
   <section class="vue" id="vue-rapports">
     <div class="panel c-rose">
-      <h2>Rapports d'appels</h2>
-      <select id="rapportsCampagneSelect" onchange="chargerAppels()"></select>
+      <h2>Rapports d'appels <small>Métriques détaillées par campagne</small></h2>
+      <select id="rapportsCampagneSelect" onchange="chargerAppels(); chargerStatsRapport();"></select>
+      <div class="stats-grid" id="statsRapport" style="margin-top:12px;"></div>
       <div class="row" style="margin-top:8px;">
-        <button class="secondaire" onclick="chargerAppels()">Rafraîchir</button>
-        <button class="vert" onclick="exporterCsv()">Exporter CSV</button>
-        <button class="orange" onclick="nettoyerBlockes()">Nettoyer bloqués</button>
+        <button class="secondaire" onclick="chargerAppels(); chargerStatsRapport();">🔄 Rafraîchir</button>
+        <button class="vert" onclick="exporterCsv()">⬇ Exporter CSV</button>
+        <button class="orange" onclick="nettoyerBlockes()">🧹 Nettoyer bloqués</button>
       </div>
-      <table style="margin-top:10px;">
-        <thead><tr><th>Date / Heure</th><th>Contact</th><th>Statut</th><th>RDV</th><th>Durée</th><th>Action</th></tr></thead>
-        <tbody id="appelsBody"><tr><td colspan="6" class="hint">Sélectionne une campagne.</td></tr></tbody>
-      </table>
+      <div class="row" style="margin-top:8px;">
+        <select id="filtreStatutAppel" onchange="rendreAppels()">
+          <option value="">Tous les statuts</option>
+          <option value="en_cours">En cours</option>
+          <option value="repondu">Répondu (attente AMD)</option>
+          <option value="termine">Terminé</option>
+          <option value="sans_reponse">Sans réponse</option>
+          <option value="occupe">Occupé</option>
+          <option value="echoue">Échoué</option>
+          <option value="annule">Annulé</option>
+          <option value="timeout">Timeout</option>
+          <option value="erreur">Erreur</option>
+        </select>
+        <input id="rechercheAppel" placeholder="Rechercher un numéro..." oninput="rendreAppels()" />
+      </div>
+      <div class="table-scroll">
+        <table style="margin-top:10px;">
+          <thead><tr>
+            <th>Date / Heure</th><th>Téléphone</th><th>Pays</th><th>Langue</th><th>Statut</th>
+            <th>Répondeur</th><th>Msg humain</th><th>Msg répondeur</th><th>Msg lu</th>
+            <th>Tours</th><th>Durée</th><th>Action</th>
+          </tr></thead>
+          <tbody id="appelsBody"><tr><td colspan="12" class="hint">Sélectionne une campagne.</td></tr></tbody>
+        </table>
+      </div>
+      <p class="hint" id="appelsCompteur"></p>
     </div>
   </section>
 
   <!-- BOARD (4e position) -->
   <section class="vue active" id="vue-dashboard">
     <div class="panel c-vert">
-      <h2>Vue d'ensemble (toutes campagnes)</h2>
+      <h2>Vue d'ensemble (toutes campagnes) <small>Mode message unique — métriques complètes</small></h2>
       <div class="stats-grid" id="statsGlobales"></div>
     </div>
     <div class="panel c-vert">
@@ -349,7 +419,26 @@
       <label>Clé API</label>
       <input id="apiKey" type="password" placeholder="valeur de la variable API_KEY" />
       <button onclick="sauverConfig()">Enregistrer et tester la connexion</button>
+      <div id="configMsg"></div>
       <p class="hint">Stocké uniquement dans ce navigateur (localStorage isolé).</p>
+    </div>
+
+    <div class="panel c-cyan">
+      <h2>Statut Telnyx</h2>
+      <div id="statutTelnyxBox" class="hint">Charge la config puis reviens ici.</div>
+    </div>
+
+    <div class="panel c-turquoise">
+      <h2>💡 Astuces pour alléger la facture Telnyx</h2>
+      <div class="astuce-box">
+        <b>1 seul canal actif (déjà en place).</b> Le Worker bloque tout appel simultané : impossible de payer deux communications en même temps par erreur.<br/><br/>
+        <b>Message court = moins de secondes facturées.</b> Telnyx facture à la minute entamée sur la durée totale de l'appel (décroché + AMD + speak). Un message de 10-15 secondes coûte nettement moins qu'un message d'une minute.<br/><br/>
+        <b>Le raccrochage est automatique dès la fin du message</b> (garde-fou dur) : aucun appel ne reste "ouvert" à ne rien faire, ce qui évite de payer du silence facturé.<br/><br/>
+        <b>Nettoyage régulier des appels bloqués.</b> Utilise le bouton "🧹 Nettoyer bloqués" (ou laisse le cron faire son travail) : un appel qui reste bloqué côté D1 n'est pas forcément raccroché côté Telnyx si un webhook a été manqué — vérifie régulièrement dans l'onglet Rapports.<br/><br/>
+        <b>Cible tes créneaux horaires.</b> Limiter les appels aux heures où les gens décrochent réellement réduit le nombre d'appels "sans réponse" facturés pour rien.<br/><br/>
+        <b>Vérifie tes numéros avant import.</b> Un numéro invalide ou mal formaté qui part quand même en appel = minute facturée pour un appel voué à l'échec. Le nettoyage automatique des numéros à l'import limite ce risque.<br/><br/>
+        <b>Voix "male + premium" vs voix standard.</b> Le Worker essaie d'abord la voix premium Telnyx, avec repli automatique. Si le coût de la voix premium te pèse, tu peux demander à ce que le Worker essaie d'abord la voix standard (économie possible, qualité audio légèrement différente) — c'est un réglage côté Worker, pas dans cette interface.
+      </div>
     </div>
   </section>
 
@@ -397,19 +486,16 @@
     </div>
     <label>Sujet</label><input id="editSujet" />
     <label>Objectif</label><textarea id="editObjectif" rows="2"></textarea>
-    <label>Introduction</label><textarea id="editIntro" rows="2"></textarea>
-    <label>Points clés (un par ligne)</label><textarea id="editPoints" rows="3"></textarea>
+    <label>Introduction — message lu tel quel si un humain décroche</label><textarea id="editIntro" rows="3"></textarea>
+    <label>Points clés (un par ligne)</label><textarea id="editPoints" rows="2"></textarea>
     <label>Mots-clés</label><input id="editMots" />
     <label>Sujets à éviter</label><textarea id="editEviter" rows="2"></textarea>
-    <label>Capacités commerciales</label><textarea id="editCapacites" rows="3"></textarea>
-    <label>Directives comportementales</label><textarea id="editDirectives" rows="3"></textarea>
-    <label><input type="checkbox" id="editRepondeurActif" /> Laisser un message si répondeur</label>
-    <textarea id="editRepondeurMessage" rows="2" placeholder="Message répondeur"></textarea>
-    <label>Prestataire vocal</label>
-    <select id="editPrestataireVoix">
-      <option value="workers-ai">Cloudflare Workers AI</option>
-      <option value="elevenlabs">ElevenLabs</option>
-    </select>
+    <label>Capacités commerciales</label><textarea id="editCapacites" rows="2"></textarea>
+    <label>Directives comportementales</label><textarea id="editDirectives" rows="2"></textarea>
+    <label><input type="checkbox" id="editRepondeurActif" /> Message répondeur distinct</label>
+    <p class="hint">Le détecteur de répondeur (AMD) est toujours actif côté Worker. Cette case indique seulement si le message ci-dessous doit être utilisé au lieu de relire l'introduction.</p>
+    <label>Message répondeur — lu tel quel après le bip</label><textarea id="editRepondeurMessage" rows="3"></textarea>
+    <input type="hidden" id="editPrestataireVoix" value="telnyx" />
     <div class="row">
       <div><label>Ordre des appels</label>
         <select id="editOrdreAppel">
@@ -470,9 +556,17 @@ async function sauverConfig() {
   }
   localStorage.setItem('pgi_phoning_center_pro_workerUrl', url);
   localStorage.setItem('pgi_phoning_center_pro_apiKey', key);
-  await chargerEtat();
-  chargerCampagnes();
-  alert('Configuration enregistrée ✓');
+  const msg = document.getElementById('configMsg');
+  msg.innerHTML = '';
+  try {
+    await chargerEtat();
+    await chargerStatutTelnyx();
+    await chargerCampagnes();
+    await chargerListes();
+    msg.innerHTML = '<div class="succes-msg">Configuration enregistrée et connexion vérifiée ✓</div>';
+  } catch (e) {
+    msg.innerHTML = `<div class="erreur-msg">Configuration enregistrée, mais la connexion a échoué : ${echapperHtml(e.message)}</div>`;
+  }
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -484,11 +578,12 @@ function changerVue(nom) {
   document.getElementById('vue-' + nom).classList.add('active');
   document.getElementById('tab-' + nom).classList.add('active');
   if (nom === 'dashboard') chargerDashboard();
-  if (nom === 'rapports')  { chargerCampagnes(); chargerAppels(); }
+  if (nom === 'rapports')  { chargerCampagnes().then(() => { chargerAppels(); chargerStatsRapport(); }); }
   if (nom === 'notes')     chargerNotes();
   if (nom === 'liens')     chargerLiens();
   if (nom === 'listes')    chargerListes();
   if (nom === 'campagnes') chargerCampagnes();
+  if (nom === 'config')    chargerStatutTelnyx();
 }
 
 window.addEventListener('load', () => {
@@ -497,7 +592,11 @@ window.addEventListener('load', () => {
   document.getElementById('workerUrl').value = urlStocke;
   document.getElementById('apiKey').value    = keyStocke;
   ajouterLigneCreneau();
-  if (urlStocke && keyStocke) { chargerEtat(); chargerDashboard(); }
+  if (urlStocke && keyStocke) {
+    chargerEtat();
+    chargerDashboard();
+    chargerListes();
+  }
   setInterval(majHorloge, 1000);
   setInterval(() => { if (cfgOk()) chargerEtat(); }, 60000);
   majHorloge();
@@ -508,34 +607,101 @@ function majHorloge() {
     new Date().toLocaleString('fr-FR', { timeZone: 'Europe/Paris' });
 }
 
-async function appel(chemin, options = {}) {
+// ─────────────────────────────────────────────────────────────
+// APIFETCH CENTRALISÉ + NORMALISATION DES RÉPONSES
+// ─────────────────────────────────────────────────────────────
+async function apiFetch(chemin, options = {}) {
   const { url, key } = cfg();
-  if (!url || !key) { alert("Configure l'URL du Worker et la clé API dans l'onglet ⚙️ Config."); throw new Error('config manquante'); }
+  if (!url || !key) {
+    const err = new Error("Configure l'URL du Worker et la clé API dans l'onglet ⚙️ Config.");
+    err.configManquante = true;
+    throw err;
+  }
   const sep = chemin.includes('?') ? '&' : '?';
-  const res = await fetch(url + chemin + sep + 'key=' + encodeURIComponent(key), {
-    ...options,
-    headers: { 'content-type': 'application/json', 'x-api-key': key, ...(options.headers || {}) }
-  });
-  if (!res.ok) throw new Error(await res.text());
-  return res;
+  let res;
+  try {
+    res = await fetch(url + chemin + sep + 'key=' + encodeURIComponent(key), {
+      ...options,
+      headers: { 'content-type': 'application/json', 'x-api-key': key, ...(options.headers || {}) }
+    });
+  } catch (e) {
+    throw new Error(`Impossible de joindre le Worker (${e.message}). Vérifie l'URL et ta connexion.`);
+  }
+  const texte = await res.text();
+  let data = null;
+  try { data = texte ? JSON.parse(texte) : null; } catch (_) { data = null; }
+  if (!res.ok) {
+    const message = (data && (data.erreur || data.error || data.message)) || texte || `Erreur HTTP ${res.status}`;
+    const err = new Error(message);
+    err.status = res.status;
+    err.data = data;
+    throw err;
+  }
+  return data;
 }
-async function appelJson(chemin, options) { return (await appel(chemin, options)).json(); }
+
+// Compat rétro : anciens noms utilisés partout dans le fichier
+async function appel(chemin, options) { const d = await apiFetch(chemin, options); return { json: async () => d, ok: true }; }
+async function appelJson(chemin, options) { return apiFetch(chemin, options); }
+
+// Normalise n'importe quelle forme de réponse-liste en tableau JS.
+function normaliserListe(reponse, cles) {
+  if (Array.isArray(reponse)) return reponse;
+  if (reponse && typeof reponse === 'object') {
+    for (const c of (cles || ['results', 'listes', 'campagnes', 'contacts', 'items', 'data'])) {
+      if (Array.isArray(reponse[c])) return reponse[c];
+    }
+  }
+  return [];
+}
+function num(v, def) { const n = Number(v); return Number.isFinite(n) ? n : (def ?? 0); }
 
 // ─────────────────────────────────────────────────────────────
-// ÉTAT DES CONNEXIONS
+// ÉTAT DES CONNEXIONS (aligné Worker v7)
 // ─────────────────────────────────────────────────────────────
 async function chargerEtat() {
   try {
-    const e = await appelJson('/api/etat');
+    const e = await apiFetch('/api/etat');
     const items = [
-      ['worker', 'Worker'], ['base_donnees', 'Base de données'], ['stockage_audio', 'Stockage audio'],
-      ['telephonie_telnyx', 'Téléphonie (Telnyx)'], ['ia_groq', 'IA (Groq)'], ['url_base_configuree', 'URL de base (cron)'],
+      ['worker', 'Worker'],
+      ['base_donnees', 'Base D1'],
+      ['telephonie_telnyx', 'Telnyx'],
+      ['url_base_configuree', 'URL cron'],
+      ['mode_message_unique', 'Message unique'],
+      ['amd_detect_beep_systematique', 'AMD systématique'],
     ];
-    if ('voix_elevenlabs' in e) items.push(['voix_elevenlabs', 'Voix (ElevenLabs)']);
+    let html = items.map(([k, libelle]) => `<span class="puce ${e[k] ? 'ok' : 'off'}">${libelle}</span>`).join('');
+    if ('appels_actifs' in e) {
+      const max = e.max_concurrent_calls ?? 1;
+      html += `<span class="puce info">Canaux : ${e.appels_actifs}/${max}</span>`;
+    }
+    document.getElementById('etatBar').innerHTML = html;
+  } catch (err) {
     document.getElementById('etatBar').innerHTML =
-      items.map(([k, libelle]) => `<span class="puce ${e[k] ? 'ok' : 'off'}">${libelle}</span>`).join('');
-  } catch {
-    document.getElementById('etatBar').innerHTML = '<span class="puce off">Worker : non connecté</span>';
+      `<span class="puce off">Worker : non connecté${err.configManquante ? '' : ' — ' + echapperHtml(err.message)}</span>`;
+  }
+}
+
+async function chargerStatutTelnyx() {
+  const box = document.getElementById('statutTelnyxBox');
+  try {
+    const s = await apiFetch('/api/status/telnyx');
+    const champs = [
+      ['telnyx_api_key', 'Clé API Telnyx'],
+      ['telnyx_connection_id', 'Connection ID'],
+      ['telnyx_application_id', 'Application ID'],
+      ['telnyx_outbound_profile_id', 'Profil sortant'],
+      ['telnyx_from_number', 'Numéro sortant'],
+    ];
+    box.innerHTML = `
+      <div class="stats-grid" style="grid-template-columns:repeat(2,1fr);">
+        ${champs.map(([k, l]) => `<span class="puce ${s[k] ? 'ok' : 'off'}" style="text-align:center;">${l}</span>`).join('')}
+      </div>
+      <p class="${s.ready_for_calls ? 'succes-msg' : 'erreur-msg'}" style="margin-top:10px;">
+        ${s.ready_for_calls ? '✓ Prêt à passer des appels' : '✗ Configuration incomplète : ' + (s.missing || []).join(', ')}
+      </p>`;
+  } catch (e) {
+    box.innerHTML = `<div class="erreur-msg">Impossible de charger le statut Telnyx : ${echapperHtml(e.message)}</div>`;
   }
 }
 
@@ -595,115 +761,221 @@ function supprimerLigneCreneauEdit(id) { editCreneauxTemp = editCreneauxTemp.fil
 function majCreneauEdit(id, champ, valeur) { const c = editCreneauxTemp.find(c => c.id === id); if (c) c[champ] = valeur; }
 
 // ─────────────────────────────────────────────────────────────
-// LISTES
+// LISTES + CONTACTS
 // ─────────────────────────────────────────────────────────────
+let dernieresListes = [];
+let contactsPageCourante = 1;
+const CONTACTS_PAR_PAGE = 50;
+
 async function creerListe() {
   const nom = document.getElementById('listeNom').value.trim();
-  if (!nom) return alert('Nom requis.');
-  await appelJson('/api/listes', { method: 'POST', body: JSON.stringify({ nom }) });
-  document.getElementById('listeNom').value = '';
-  chargerListes();
+  const msg = document.getElementById('listeMsg');
+  msg.innerHTML = '';
+  if (!nom) { msg.innerHTML = '<div class="erreur-msg">Nom requis.</div>'; return; }
+  try {
+    await apiFetch('/api/listes', { method: 'POST', body: JSON.stringify({ nom }) });
+    document.getElementById('listeNom').value = '';
+    msg.innerHTML = '<div class="succes-msg">Liste créée ✓</div>';
+    await chargerListes();
+  } catch (e) {
+    msg.innerHTML = `<div class="erreur-msg">Erreur : ${echapperHtml(e.message)}</div>`;
+  }
 }
 
 async function chargerListes() {
-  const listes = await appelJson('/api/listes');
+  let listes = [];
+  try {
+    const reponse = await apiFetch('/api/listes');
+    listes = normaliserListe(reponse, ['results', 'listes']);
+  } catch (e) {
+    document.getElementById('listeListes').innerHTML = `<div class="erreur-msg">Impossible de charger les listes : ${echapperHtml(e.message)}</div>`;
+    return;
+  }
+  dernieresListes = listes;
+
   document.getElementById('listeListes').innerHTML = listes.map(l => `
     <div class="liste-item">
-      <b>${l.nom}</b><br/>
-      <span class="hint">${l.nb_contacts} contact(s) · ${l.nb_a_appeler} à appeler</span>
-      <div style="margin-top:6px;">
-        <button class="small danger" onclick="supprimerListe(${l.id}, '${l.nom.replace(/'/g,"\\'")}')">🗑 Supprimer</button>
+      <b>${echapperHtml(l.nom)}</b><br/>
+      <span class="hint">${num(l.nb_contacts)} contact(s) · ${num(l.nb_a_appeler)} à appeler</span>
+      <div class="liste-actions">
+        <button class="small" onclick="afficherContactsListe(${l.id}, 1)">👁 Voir contacts</button>
+        <button class="small danger" onclick="supprimerListe(${l.id}, '${(l.nom||'').replace(/'/g,"\\'")}')">🗑 Supprimer</button>
       </div>
-    </div>`).join('') || '<p class="hint">Aucune liste.</p>';
-  const options = listes.map(l => `<option value="${l.id}">${l.nom} (${l.nb_contacts})</option>`).join('');
-  ['listeSelectImport','campListe','editListe'].forEach(id => {
+    </div>`).join('') || '<p class="hint">Aucune liste. Crée-en une ci-dessus.</p>';
+
+  const options = listes.map(l => `<option value="${l.id}">${echapperHtml(l.nom)} (${num(l.nb_contacts)})</option>`).join('');
+  ['listeSelectImport','campListe','editListe','listeSelectView'].forEach(id => {
     const sel = document.getElementById(id);
-    if (sel) { const v = sel.value; sel.innerHTML = options; if (v) sel.value = v; }
+    if (sel) { const v = sel.value; sel.innerHTML = options; if (v && [...sel.options].some(o => o.value === v)) sel.value = v; }
   });
+
+  // Vue d'ensemble contacts (onglet Contacts)
+  const totalListes    = listes.length;
+  const totalContacts  = listes.reduce((s, l) => s + num(l.nb_contacts), 0);
+  const totalAAppeler  = listes.reduce((s, l) => s + num(l.nb_a_appeler), 0);
+  const totalAutres    = Math.max(0, totalContacts - totalAAppeler); // appelé + en_cours combinés
+  document.getElementById('statsContactsGlobal').innerHTML = `
+    <div class="stat" style="border-top-color:var(--orange)"><div class="valeur" style="color:var(--orange)">${totalListes}</div><div class="libelle">Listes</div></div>
+    <div class="stat" style="border-top-color:var(--cyan)"><div class="valeur" style="color:var(--cyan)">${totalContacts}</div><div class="libelle">Contacts total</div></div>
+    <div class="stat" style="border-top-color:var(--vert)"><div class="valeur" style="color:var(--vert)">${totalAAppeler}</div><div class="libelle">À appeler</div></div>
+    <div class="stat" style="border-top-color:var(--jaune)"><div class="valeur" style="color:var(--jaune)">${totalAutres}</div><div class="libelle">Appelés + en cours</div></div>
+  `;
+  document.getElementById('statsContactsNote').textContent =
+    'Le détail "appelés" vs "en cours" séparément nécessite une route Worker supplémentaire (non disponible actuellement) — voir la note à ce sujet.';
 }
 
 async function supprimerListe(id, nom) {
   if (!confirm(`Supprimer la liste "${nom}" et tous ses contacts ?\n\nAttention : cette action est irréversible.`)) return;
   try {
-    const res = await appelJson(`/api/listes/${id}`, { method: 'DELETE' });
-    if (res.ok) { chargerListes(); }
+    await apiFetch(`/api/listes/${id}`, { method: 'DELETE' });
+    await chargerListes();
   } catch(e) {
-    // Si la liste est utilisée par des campagnes, l'API renvoie 409 avec le détail
-    try {
-      const data = JSON.parse(e.message);
-      if (data.campagnes) {
-        alert(`Impossible de supprimer : cette liste est utilisée par :\n${data.campagnes.map(c => `- ${c.nom}`).join('\n')}\n\nSupprime ou modifie ces campagnes d'abord.`);
-      } else {
-        alert('Erreur : ' + e.message);
-      }
-    } catch { alert('Erreur : ' + e.message); }
+    if (e.data && e.data.campagnes) {
+      alert(`Impossible de supprimer : cette liste est utilisée par :\n${e.data.campagnes.map(c => `- ${c.nom}`).join('\n')}\n\nSupprime ou modifie ces campagnes d'abord.`);
+    } else {
+      alert('Erreur : ' + e.message);
+    }
+  }
+}
+
+async function afficherContactsListe(id, page) {
+  if (!id) { document.getElementById('contactsBody').innerHTML = '<tr><td colspan="6" class="hint">Sélectionne une liste.</td></tr>'; document.getElementById('contactsPagination').innerHTML=''; return; }
+  document.getElementById('listeSelectView').value = id;
+  contactsPageCourante = page || 1;
+  const corps = document.getElementById('contactsBody');
+  corps.innerHTML = '<tr><td colspan="6" class="hint">Chargement…</td></tr>';
+  try {
+    const reponse = await apiFetch(`/api/listes/${id}?page=${contactsPageCourante}&limite=${CONTACTS_PAR_PAGE}`);
+    let contacts = normaliserListe(reponse, ['results', 'contacts']);
+    const total  = (reponse && typeof reponse === 'object' && 'total' in reponse) ? num(reponse.total) : contacts.length;
+    const limite = (reponse && typeof reponse === 'object' && 'limite' in reponse) ? num(reponse.limite, CONTACTS_PAR_PAGE) : CONTACTS_PAR_PAGE;
+
+    const filtre = document.getElementById('filtreStatutContact').value;
+    if (filtre) contacts = contacts.filter(c => c.statut === filtre);
+
+    corps.innerHTML = contacts.length ? contacts.map(c => `
+      <tr>
+        <td>${echapperHtml(c.phone || '')}</td>
+        <td>${echapperHtml(c.prenom || '—')}</td>
+        <td>${echapperHtml(c.nom || '—')}</td>
+        <td>${echapperHtml(c.pays || '—')}</td>
+        <td>${echapperHtml(c.langue || '—')}</td>
+        <td><span class="badge ${c.statut}">${echapperHtml(c.statut || '—')}</span></td>
+      </tr>`).join('') : '<tr><td colspan="6" class="hint">Aucun contact trouvé' + (filtre ? ' pour ce filtre.' : ' dans cette liste — vérifie qu\'un import a bien été effectué.') + '</td></tr>';
+
+    const totalPages = Math.max(1, Math.ceil(total / limite));
+    document.getElementById('contactsPagination').innerHTML = total > limite ? `
+      <button class="small secondaire" ${contactsPageCourante<=1?'disabled':''} onclick="afficherContactsListe(${id}, ${contactsPageCourante-1})">← Précédent</button>
+      <span>Page ${contactsPageCourante} / ${totalPages} — ${total} contact(s)</span>
+      <button class="small secondaire" ${contactsPageCourante>=totalPages?'disabled':''} onclick="afficherContactsListe(${id}, ${contactsPageCourante+1})">Suivant →</button>
+    ` : `<span>${total} contact(s) au total</span>`;
+  } catch (e) {
+    corps.innerHTML = `<tr><td colspan="6"><div class="erreur-msg">Erreur de chargement : ${echapperHtml(e.message)}</div></td></tr>`;
+    document.getElementById('contactsPagination').innerHTML = '';
   }
 }
 
 function parserTextePaste(texte) {
   return texte.split('\n').map(l => l.trim()).filter(Boolean).map(l => {
-    const [phone, prenom, nom, pays, langue, notes] = l.split(',').map(s => (s||'').trim());
-    return { phone, prenom: nom ? prenom : null, nom: nom || prenom || null, pays, langue, notes };
+    const parts = l.split(',').map(s => (s||'').trim());
+    const [phone, prenom, nom, pays, langue, notes] = parts;
+    return { phone, prenom: prenom || null, nom: nom || null, pays: pays || null, langue: langue || null, notes: notes || null };
   });
 }
 
 const CHUNK_FRONT = 5000; // contacts envoyés par requête API (Worker les traite par 500)
 
-async function importerCsv() {
-  const id = document.getElementById('listeSelectImport').value;
-  if (!id) return alert('Sélectionne une liste.');
-  const langue_defaut = document.getElementById('listeLangueDefaut').value;
-  const contacts = parserTextePaste(document.getElementById('contactsCsv').value);
-  if (!contacts.length) return alert('Aucun numéro valide trouvé.');
-  const total = await importerChunks(id, contacts, langue_defaut);
-  alert(`✓ ${total} contact(s) importé(s).`);
-  document.getElementById('contactsCsv').value = '';
-  chargerListes();
+async function importerAvecRetour(listeId, contacts, langue_defaut, boutonId) {
+  const msg = document.getElementById('importMsg');
+  const btn = boutonId ? document.getElementById(boutonId) : null;
+  if (btn) { btn.disabled = true; btn.textContent = 'Import en cours…'; }
+  msg.innerHTML = '';
+  try {
+    const total = await importerChunks(listeId, contacts, langue_defaut);
+    msg.innerHTML = `<div class="succes-msg">✓ ${total} contact(s) importé(s) sur ${contacts.length} lu(s).</div>`;
+    // Recharge immédiate : listes (compteurs) + contacts affichés si c'est la liste consultée
+    await chargerListes();
+    if (document.getElementById('listeSelectView').value == listeId) {
+      await afficherContactsListe(listeId, 1);
+    }
+  } catch (e) {
+    msg.innerHTML = `<div class="erreur-msg">Erreur pendant l'import : ${echapperHtml(e.message)}</div>`;
+  } finally {
+    if (btn) { btn.disabled = false; }
+  }
+  return btn;
 }
 
 async function importerChunks(listeId, contacts, langue_defaut) {
   let totalImportes = 0;
   for (let i = 0; i < contacts.length; i += CHUNK_FRONT) {
     const chunk = contacts.slice(i, i + CHUNK_FRONT);
-    const res = await appelJson(`/api/listes/${listeId}/contacts`, {
+    const res = await apiFetch(`/api/listes/${listeId}/contacts`, {
       method: 'POST', body: JSON.stringify({ contacts: chunk, langue_defaut })
     });
-    totalImportes += res.importes || 0;
-    // Afficher la progression dans le titre de la page si import long
+    totalImportes += num(res && res.importes);
     const pct = Math.round(((i + chunk.length) / contacts.length) * 100);
     document.title = `Import ${pct}% — PGI Phoning Center Pro`;
-    if (pct % 10 === 0) console.log(`[IMPORT] ${pct}% — ${totalImportes} importés`);
   }
   document.title = 'PGI • Phoning Center Pro';
   return totalImportes;
 }
 
+async function importerCsv() {
+  const id = document.getElementById('listeSelectImport').value;
+  const msg = document.getElementById('importMsg');
+  if (!id) { msg.innerHTML = '<div class="erreur-msg">Sélectionne une liste cible.</div>'; return; }
+  const langue_defaut = document.getElementById('listeLangueDefaut').value;
+  const contacts = parserTextePaste(document.getElementById('contactsCsv').value);
+  if (!contacts.length) { msg.innerHTML = '<div class="erreur-msg">Aucun numéro valide trouvé dans le texte collé.</div>'; return; }
+  const btn = await importerAvecRetour(id, contacts, langue_defaut, 'btnImportCsv');
+  if (btn) btn.textContent = 'Importer le texte collé';
+  document.getElementById('contactsCsv').value = '';
+}
+
 async function importerFichier() {
   const id = document.getElementById('listeSelectImport').value;
-  if (!id) return alert('Sélectionne une liste.');
+  const msg = document.getElementById('importMsg');
+  if (!id) { msg.innerHTML = '<div class="erreur-msg">Sélectionne une liste cible.</div>'; return; }
   const langue_defaut = document.getElementById('listeLangueDefaut').value;
   const fichier = document.getElementById('fichierImport').files[0];
-  if (!fichier) return alert('Choisis un fichier.');
-  const classeur = XLSX.read(await fichier.arrayBuffer());
-  const lignes = XLSX.utils.sheet_to_json(classeur.Sheets[classeur.SheetNames[0]], { header: 1 });
-  const contacts = lignes
-    .filter(l => l[0] && String(l[0]).trim().startsWith('+'))
-    .map(l => ({ phone: String(l[0]).trim(), prenom: l[1]||null, nom: l[2]||null, pays: l[3]||null, langue: l[4]||null, notes: l[5]||null }));
-  if (!contacts.length) return alert('Aucun numéro valide trouvé dans le fichier.');
-  const t = await importerChunks(id, contacts, langue_defaut);
-  alert(`✓ ${t} contact(s) importé(s) depuis le fichier.`);
-  chargerListes();
+  if (!fichier) { msg.innerHTML = '<div class="erreur-msg">Choisis un fichier.</div>'; return; }
+  let contacts = [];
+  try {
+    const classeur = XLSX.read(await fichier.arrayBuffer());
+    const lignes = XLSX.utils.sheet_to_json(classeur.Sheets[classeur.SheetNames[0]], { header: 1 });
+    contacts = lignes
+      .filter(l => l[0] && String(l[0]).trim().length > 3)
+      .map(l => ({ phone: String(l[0]).trim(), prenom: l[1]||null, nom: l[2]||null, pays: l[3]||null, langue: l[4]||null, notes: l[5]||null }));
+  } catch (e) {
+    msg.innerHTML = `<div class="erreur-msg">Fichier illisible : ${echapperHtml(e.message)}</div>`;
+    return;
+  }
+  if (!contacts.length) { msg.innerHTML = '<div class="erreur-msg">Aucun numéro valide trouvé dans le fichier.</div>'; return; }
+  const btn = await importerAvecRetour(id, contacts, langue_defaut, 'btnImportFichier');
+  if (btn) btn.textContent = 'Importer le fichier';
+  document.getElementById('fichierImport').value = '';
 }
 
 async function importerDepuisUrl() {
   const id = document.getElementById('listeSelectImport').value;
-  if (!id) return alert('Sélectionne une liste.');
+  const msg = document.getElementById('importMsg');
+  if (!id) { msg.innerHTML = '<div class="erreur-msg">Sélectionne une liste cible.</div>'; return; }
   const langue_defaut = document.getElementById('listeLangueDefaut').value;
   const urlSheet = document.getElementById('urlGoogleSheet').value.trim();
-  if (!urlSheet) return alert('Colle une URL.');
-  const res = await appelJson(`/api/listes/${id}/contacts/depuis-url`, { method: 'POST', body: JSON.stringify({ url: urlSheet, langue_defaut }) });
-  alert(res.importes + " contact(s) importé(s).");
-  chargerListes();
+  if (!urlSheet) { msg.innerHTML = '<div class="erreur-msg">Colle une URL.</div>'; return; }
+  const btn = document.getElementById('btnImportUrl');
+  btn.disabled = true; btn.textContent = 'Import en cours…';
+  try {
+    const res = await apiFetch(`/api/listes/${id}/contacts/depuis-url`, { method: 'POST', body: JSON.stringify({ url: urlSheet, langue_defaut }) });
+    msg.innerHTML = `<div class="succes-msg">✓ ${num(res && res.importes)} contact(s) importé(s).</div>`;
+    await chargerListes();
+    if (document.getElementById('listeSelectView').value == id) await afficherContactsListe(id, 1);
+  } catch (e) {
+    msg.innerHTML = `<div class="erreur-msg">Erreur : ${echapperHtml(e.message)}</div>`;
+  } finally {
+    btn.disabled = false; btn.textContent = 'Importer depuis l\'URL';
+  }
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -726,7 +998,7 @@ function lireChampsFormulaire(prefix) {
     directives:        g('Directives')?.value.trim(),
     repondeur_actif:   g('RepondeurActif')?.checked,
     repondeur_message: g('RepondeurMessage')?.value.trim(),
-    prestataire_voix:  g('PrestataireVoix')?.value,
+    prestataire_voix:  g('PrestataireVoix')?.value || 'telnyx',
     ordre_appel:       g('OrdreAppel')?.value,
     comportement_fin:  g('ComportementFin')?.value,
     automatisation_active: g('Auto')?.checked,
@@ -734,22 +1006,32 @@ function lireChampsFormulaire(prefix) {
 }
 
 async function creerCampagne() {
+  const msg = document.getElementById('campagneMsg');
+  msg.innerHTML = '';
   const payload = lireChampsFormulaire('camp');
-  if (!payload.nom) return alert('Le nom est requis.');
+  if (!payload.nom) { msg.innerHTML = '<div class="erreur-msg">Le nom est requis.</div>'; return; }
+  if (!payload.introduction && !payload.objectif) {
+    if (!confirm("Aucune introduction ni objectif renseigné : l'appel lira \"Message non configuré. Au revoir.\" Continuer quand même ?")) return;
+  }
   payload.creneaux = creneauxTemp.map(({ id, ...c }) => c);
-  await appelJson('/api/campagnes', { method: 'POST', body: JSON.stringify(payload) });
-  alert('Campagne créée ✓');
-  chargerCampagnes();
+  try {
+    await apiFetch('/api/campagnes', { method: 'POST', body: JSON.stringify(payload) });
+    msg.innerHTML = '<div class="succes-msg">Campagne créée ✓</div>';
+    await chargerCampagnes();
+  } catch (e) {
+    msg.innerHTML = `<div class="erreur-msg">Erreur : ${echapperHtml(e.message)}</div>`;
+  }
 }
 
 async function chargerCampagnes() {
   try {
-    const campagnes = await appelJson('/api/campagnes');
+    const reponse = await apiFetch('/api/campagnes');
+    const campagnes = normaliserListe(reponse, ['results', 'campagnes']);
     document.getElementById('listeCampagnes').innerHTML = campagnes.map(c => `
       <div class="campagne-item">
-        <div class="camp-titre">${c.nom} <span class="badge ${c.statut}">${c.statut}</span></div>
+        <div class="camp-titre">${echapperHtml(c.nom)} <span class="badge ${c.statut}">${c.statut}</span></div>
         <div class="camp-meta">
-          ${c.pays} · ${c.langue} · ${c.sujet || '—'}<br/>
+          ${c.pays} · ${c.langue} · ${echapperHtml(c.sujet || '—')}<br/>
           ${(c.creneaux||[]).map(cr => `${cr.jour} ${cr.heure_debut}-${cr.heure_fin} (min ${cr.appels_min||0}/max ${cr.appels_max||'∞'})`).join(' · ') || 'aucun créneau'}
           · ordre: ${c.ordre_appel} · fin: ${c.comportement_fin}
         </div>
@@ -757,47 +1039,73 @@ async function chargerCampagnes() {
           <button class="small vert"      onclick="changerStatutCampagne(${c.id},'actif')">▶ Activer</button>
           <button class="small secondaire" onclick="changerStatutCampagne(${c.id},'pause')">⏸ Pause</button>
           <button class="small danger"    onclick="arreterCampagne(${c.id})">⏹ Arrêter</button>
-          <button class="small"           onclick="lancerCampagne(${c.id})">🚀 Lancer</button>
+          <button class="small" id="btnLancer-${c.id}" onclick="lancerCampagne(${c.id}, false, this)">🚀 Lancer</button>
           <button class="small violet"    onclick="ouvrirModifCampagne(${c.id})">✎ Modifier</button>
-          <button class="small rose"      onclick="supprimerCampagne(${c.id}, '${c.nom.replace(/'/g,"\\'")}')">🗑 Supprimer</button>
+          <button class="small rose"      onclick="supprimerCampagne(${c.id}, '${(c.nom||'').replace(/'/g,"\\'")}')">🗑 Supprimer</button>
         </div>
       </div>`).join('') || '<p class="hint">Aucune campagne.</p>';
 
-    const options = campagnes.map(c => `<option value="${c.id}">${c.nom}</option>`).join('');
+    const options = campagnes.map(c => `<option value="${c.id}">${echapperHtml(c.nom)}</option>`).join('');
     ['dashboardCampagneSelect','rapportsCampagneSelect'].forEach(id => {
       const sel = document.getElementById(id);
-      if (sel) { const v = sel.value; sel.innerHTML = options; if (v) sel.value = v; }
+      if (sel) { const v = sel.value; sel.innerHTML = options; if (v && [...sel.options].some(o => o.value === v)) sel.value = v; }
     });
     await chargerListes();
-  } catch { /* config pas encore prête */ }
+  } catch (e) {
+    document.getElementById('listeCampagnes').innerHTML = `<div class="erreur-msg">Impossible de charger les campagnes : ${echapperHtml(e.message)}</div>`;
+  }
 }
 
 async function changerStatutCampagne(id, statut) {
-  await appelJson(`/api/campagnes/${id}/statut`, { method: 'POST', body: JSON.stringify({ statut }) });
-  chargerCampagnes();
+  try {
+    await apiFetch(`/api/campagnes/${id}/statut`, { method: 'POST', body: JSON.stringify({ statut }) });
+    await chargerCampagnes();
+  } catch (e) { alert('Erreur : ' + e.message); }
 }
 
 async function arreterCampagne(id) {
-  await appelJson(`/api/campagnes/${id}/statut`, { method: 'POST', body: JSON.stringify({ statut: 'arrete' }) });
-  chargerCampagnes();
-  // Rafraîchir les rapports si on y est
-  if (document.getElementById('vue-rapports').classList.contains('active')) chargerAppels();
+  try {
+    await apiFetch(`/api/campagnes/${id}/statut`, { method: 'POST', body: JSON.stringify({ statut: 'arrete' }) });
+    await chargerCampagnes();
+    if (document.getElementById('vue-rapports').classList.contains('active')) chargerAppels();
+  } catch (e) { alert('Erreur : ' + e.message); }
 }
 
 async function supprimerCampagne(id, nom) {
   if (!confirm(`Voulez-vous vraiment supprimer la campagne "${nom}" et ses créneaux ?\n\nLes rapports d'appels sont conservés pour l'historique.`)) return;
-  await appelJson(`/api/campagnes/${id}`, { method: 'DELETE' });
-  chargerCampagnes();
+  try {
+    await apiFetch(`/api/campagnes/${id}`, { method: 'DELETE' });
+    await chargerCampagnes();
+  } catch (e) { alert('Erreur : ' + e.message); }
 }
 
-async function lancerCampagne(id, force) {
+// Verrou anti double-clic (le Worker reste la sécurité principale via D1)
+const campagnesEnLancement = new Set();
+
+async function lancerCampagne(id, force, btnEl) {
+  if (campagnesEnLancement.has(id)) return; // déjà en cours de lancement, on ignore le clic
+  campagnesEnLancement.add(id);
+  const btn = btnEl || document.getElementById('btnLancer-' + id);
+  const texteOriginal = btn ? btn.textContent : null;
+  if (btn) { btn.disabled = true; btn.textContent = 'Lancement en cours…'; }
   try {
-    const res = await appelJson(`/api/campagnes/${id}/lancer?limite=5${force ? '&force=1' : ''}`, { method: 'POST' });
-    alert('Déclenchés : ' + (res.declenches || []).join(', '));
+    const res = await apiFetch(`/api/campagnes/${id}/lancer?limite=5${force ? '&force=1' : ''}`, { method: 'POST' });
+    const declenches = (res && res.declenches) || [];
+    alert(declenches.length ? 'Déclenchés : ' + declenches.join(', ') : 'Aucun appel déclenché (liste vide, hors créneau, ou capacité atteinte).');
+    if (document.getElementById('vue-rapports').classList.contains('active')) { chargerAppels(); chargerStatsRapport(); }
   } catch (e) {
-    if (e.message.includes('Hors créneau') && confirm(e.message + '\n\nForcer maintenant ?'))
-      return lancerCampagne(id, true);
-    alert('Erreur : ' + e.message);
+    if (e.message.includes('Hors créneau')) {
+      if (confirm(e.message + '\n\nForcer maintenant ?')) {
+        campagnesEnLancement.delete(id);
+        if (btn) { btn.disabled = false; btn.textContent = texteOriginal; }
+        return lancerCampagne(id, true, btnEl);
+      }
+    } else {
+      alert('Erreur : ' + e.message);
+    }
+  } finally {
+    campagnesEnLancement.delete(id);
+    if (btn) { btn.disabled = false; btn.textContent = texteOriginal; }
   }
 }
 
@@ -807,37 +1115,40 @@ async function lancerCampagne(id, force) {
 let campagneEnCoursDEdit = null;
 
 async function ouvrirModifCampagne(id) {
-  // Charger toutes les campagnes pour trouver celle-ci
-  const campagnes = await appelJson('/api/campagnes');
+  let campagnes;
+  try {
+    const reponse = await apiFetch('/api/campagnes');
+    campagnes = normaliserListe(reponse, ['results', 'campagnes']);
+  } catch (e) { alert('Erreur : ' + e.message); return; }
   const c = campagnes.find(x => x.id === id);
   if (!c) return alert('Campagne introuvable.');
   campagneEnCoursDEdit = id;
 
-  // Pré-remplir tous les champs
   document.getElementById('editNom').value              = c.nom || '';
   document.getElementById('editPays').value             = c.pays || 'FR';
   document.getElementById('editLangue').value           = c.langue || 'fr';
   document.getElementById('editSujet').value            = c.sujet || '';
   document.getElementById('editObjectif').value         = c.objectif || '';
   document.getElementById('editIntro').value            = c.introduction || '';
-  document.getElementById('editPoints').value           = c.points_cles || '';
-  document.getElementById('editMots').value             = c.mots_cles || '';
-  document.getElementById('editEviter').value           = c.sujets_a_eviter || '';
-  document.getElementById('editCapacites').value        = c.capacites_commerciales || '';
-  document.getElementById('editDirectives').value       = c.directives || '';
-  document.getElementById('editRepondeurActif').checked = !!c.repondeur_actif;
-  document.getElementById('editRepondeurMessage').value = c.repondeur_message || '';
-  document.getElementById('editPrestataireVoix').value  = c.prestataire_voix || 'workers-ai';
-  document.getElementById('editOrdreAppel').value       = c.ordre_appel || 'sequentiel';
-  document.getElementById('editComportementFin').value  = c.comportement_fin || 'arret';
-  document.getElementById('editAuto').checked           = !!c.automatisation_active;
+  document.getElementById('editPoints').value            = c.points_cles || '';
+  document.getElementById('editMots').value              = c.mots_cles || '';
+  document.getElementById('editEviter').value            = c.sujets_a_eviter || '';
+  document.getElementById('editCapacites').value         = c.capacites_commerciales || '';
+  document.getElementById('editDirectives').value        = c.directives || '';
+  document.getElementById('editRepondeurActif').checked  = !!c.repondeur_actif;
+  document.getElementById('editRepondeurMessage').value  = c.repondeur_message || '';
+  document.getElementById('editPrestataireVoix').value   = 'telnyx';
+  document.getElementById('editOrdreAppel').value        = c.ordre_appel || 'sequentiel';
+  document.getElementById('editComportementFin').value   = c.comportement_fin || 'arret';
+  document.getElementById('editAuto').checked             = !!c.automatisation_active;
 
-  // Charger les listes pour le select
-  const listes = await appelJson('/api/listes');
-  const opts = listes.map(l => `<option value="${l.id}" ${l.id == c.liste_id?'selected':''}>${l.nom}</option>`).join('');
-  document.getElementById('editListe').innerHTML = opts;
+  try {
+    const reponseListes = await apiFetch('/api/listes');
+    const listes = normaliserListe(reponseListes, ['results', 'listes']);
+    document.getElementById('editListe').innerHTML =
+      listes.map(l => `<option value="${l.id}" ${l.id == c.liste_id?'selected':''}>${echapperHtml(l.nom)}</option>`).join('');
+  } catch (_) {}
 
-  // Créneaux
   editCreneauxTemp = (c.creneaux || []).map(cr => ({ ...cr, id: cr.id?.toString() || crypto.randomUUID() }));
   renderCreneauxDans('editCreneauxContainer', editCreneauxTemp, 'majCreneauEdit', 'supprimerLigneCreneauEdit');
 
@@ -854,83 +1165,178 @@ async function sauvegarderModif() {
   const payload = lireChampsFormulaire('edit');
   if (!payload.nom) return alert('Le nom est requis.');
   payload.creneaux = editCreneauxTemp.map(({ id, ...c }) => c);
-  await appelJson(`/api/campagnes/${campagneEnCoursDEdit}`, { method: 'PUT', body: JSON.stringify(payload) });
-  fermerModalModif();
-  chargerCampagnes();
-  alert('Campagne modifiée ✓ — les prochains appels utiliseront les nouveaux paramètres.');
+  try {
+    await apiFetch(`/api/campagnes/${campagneEnCoursDEdit}`, { method: 'PUT', body: JSON.stringify(payload) });
+    fermerModalModif();
+    await chargerCampagnes();
+    alert('Campagne modifiée ✓ — les prochains appels utiliseront les nouveaux paramètres.');
+  } catch (e) { alert('Erreur : ' + e.message); }
 }
 
 // ─────────────────────────────────────────────────────────────
-// BOARD (dashboard)
+// STATS — rendu générique aligné sur le Worker v7
 // ─────────────────────────────────────────────────────────────
-function rendreStats(conteneurId, s) {
-  const tauxReponse = s.total ? Math.round((s.decroches / s.total) * 100) : 0;
+const DEFS_STATS_GLOBALES = [
+  ['total','Appels lancés','cyan'], ['decroches','Décrochés / messages lus','vert'],
+  ['sans_reponse','Sans réponse','orange'], ['echecs','Échecs (total)','err'],
+  ['occupes','Occupés','orange'], ['annules','Annulés','texte-dim'],
+  ['timeouts','Timeouts','err'], ['erreurs','Erreurs','err'],
+  ['termines','Terminés','vert'], ['repondeurs','Répondeurs détectés','violet'],
+  ['messages_repondeur','Messages répondeur laissés','violet'], ['messages_humains','Messages humains lus','cyan'],
+  ['messages_lus_total','Messages lus (total)','vert'], ['appels_en_cours','Appels en cours','jaune'],
+  ['appels_repondus_non_termines','Répondus non terminés','jaune'], ['appels_actifs','Canaux actifs','rose'],
+];
+const DEFS_STATS_POURCENT = [
+  ['taux_reponse','Taux réponse','rose'], ['taux_repondeur','Taux répondeur','violet'],
+  ['taux_message_repondeur','Taux msg répondeur','violet'], ['taux_message_humain','Taux msg humain','cyan'],
+  ['taux_echec','Taux échec','err'],
+];
+const DEFS_STATS_DUREE = [
+  ['duree_moyenne','Durée moyenne','cyan','s'], ['duree_max','Durée max','cyan','s'], ['duree_totale','Durée totale','cyan','s'],
+];
+
+function rendreStats(conteneurId, s, options) {
+  options = options || {};
+  s = s || {};
   const neon = (hex) => `text-shadow: 0 0 8px ${hex}99, 0 0 18px ${hex}44`;
-  document.getElementById(conteneurId).innerHTML = `
-    <div class="stat" style="border-top-color:var(--cyan)">  <div class="valeur" style="color:var(--cyan);${neon('#34c8ff')}">${s.total||0}</div><div class="libelle">Appels lancés</div></div>
-    <div class="stat" style="border-top-color:var(--vert)">  <div class="valeur" style="color:var(--vert);${neon('#2ee87a')}">${s.decroches||0}</div><div class="libelle">Décrochés</div></div>
-    <div class="stat" style="border-top-color:var(--orange)"><div class="valeur" style="color:var(--orange);${neon('#ff9d3d')}">${s.sans_reponse||0}</div><div class="libelle">Sans réponse</div></div>
-    <div class="stat" style="border-top-color:var(--err)">   <div class="valeur" style="color:var(--err);${neon('#ff4d6d')}">${s.echecs||0}</div><div class="libelle">Échoués</div></div>
-    <div class="stat" style="border-top-color:var(--violet)"><div class="valeur" style="color:var(--violet);${neon('#b758ff')}">${Math.round(s.duree_moyenne||0)}s</div><div class="libelle">Durée moyenne</div></div>
-    <div class="stat" style="border-top-color:var(--jaune)"> <div class="valeur" style="color:var(--jaune);${neon('#ffe34d')}">${s.rdv_pris||0}</div><div class="libelle">RDV pris</div></div>
-    <div class="stat" style="border-top-color:var(--rose)">  <div class="valeur" style="color:var(--rose);${neon('#ff2d9e')}">${tauxReponse}%</div><div class="libelle">Taux de réponse</div></div>
-  `;
+  const couleurCss = c => c === 'texte-dim' ? 'var(--texte-dim)' : `var(--${c})`;
+  let html = '';
+  for (const [cle, libelle, couleur] of DEFS_STATS_GLOBALES) {
+    if (cle === 'appels_actifs' && !('appels_actifs' in s)) continue;
+    const val = num(s[cle]);
+    html += `<div class="stat" style="border-top-color:${couleurCss(couleur)}"><div class="valeur" style="color:${couleurCss(couleur)}">${val}</div><div class="libelle">${libelle}</div></div>`;
+  }
+  if (options.maxConcurrent !== undefined) {
+    html += `<div class="stat" style="border-top-color:var(--texte-dim)"><div class="valeur">${options.maxConcurrent}</div><div class="libelle">Max canaux simultanés</div></div>`;
+  }
+  for (const [cle, libelle, couleur, unite] of DEFS_STATS_DUREE) {
+    const val = Math.round(num(s[cle]));
+    html += `<div class="stat" style="border-top-color:${couleurCss(couleur)}"><div class="valeur" style="color:${couleurCss(couleur)}">${val}${unite||''}</div><div class="libelle">${libelle}</div></div>`;
+  }
+  for (const [cle, libelle, couleur] of DEFS_STATS_POURCENT) {
+    const val = num(s[cle]);
+    html += `<div class="stat" style="border-top-color:${couleurCss(couleur)}"><div class="valeur" style="color:${couleurCss(couleur)}">${val}%</div><div class="libelle">${libelle}</div></div>`;
+  }
+  document.getElementById(conteneurId).innerHTML = html;
 }
 
 async function chargerDashboard() {
   await chargerCampagnes();
-  rendreStats('statsGlobales', await appelJson('/api/stats'));
+  try {
+    const s = await apiFetch('/api/stats');
+    rendreStats('statsGlobales', s, { maxConcurrent: s.max_concurrent_calls });
+  } catch (e) {
+    document.getElementById('statsGlobales').innerHTML = `<div class="erreur-msg">Impossible de charger les stats globales : ${echapperHtml(e.message)}</div>`;
+  }
   if (document.getElementById('dashboardCampagneSelect').value) chargerStatsCampagne();
 }
 
 async function chargerStatsCampagne() {
   const id = document.getElementById('dashboardCampagneSelect').value;
-  if (id) rendreStats('statsCampagne', await appelJson(`/api/campagnes/${id}/stats`));
+  if (!id) { document.getElementById('statsCampagne').innerHTML = ''; return; }
+  try {
+    const s = await apiFetch(`/api/campagnes/${id}/stats`);
+    rendreStats('statsCampagne', s);
+  } catch (e) {
+    document.getElementById('statsCampagne').innerHTML = `<div class="erreur-msg">Erreur : ${echapperHtml(e.message)}</div>`;
+  }
+}
+
+async function chargerStatsRapport() {
+  const id = document.getElementById('rapportsCampagneSelect').value;
+  if (!id) { document.getElementById('statsRapport').innerHTML = ''; return; }
+  try {
+    const s = await apiFetch(`/api/campagnes/${id}/stats`);
+    rendreStats('statsRapport', s);
+  } catch (e) {
+    document.getElementById('statsRapport').innerHTML = `<div class="erreur-msg">Erreur : ${echapperHtml(e.message)}</div>`;
+  }
 }
 
 // ─────────────────────────────────────────────────────────────
-// RAPPORTS
+// RAPPORTS — liste des appels enrichie (mode message unique)
 // ─────────────────────────────────────────────────────────────
+let derniersAppels = [];
+
+function formaterDateHeure(brut) {
+  if (!brut) return '';
+  try {
+    const d = new Date(String(brut).replace(' ', 'T') + 'Z');
+    return d.toLocaleString('fr-FR', { timeZone: 'Europe/Paris', day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit' });
+  } catch (_) { return brut; }
+}
+
 async function chargerAppels() {
   const id = document.getElementById('rapportsCampagneSelect').value;
-  if (!id) return;
-  const appels = await appelJson(`/api/campagnes/${id}/appels`);
-  document.getElementById('appelsBody').innerHTML = appels.length ? appels.map(a => {
-    // Formater created_at (format SQLite : "YYYY-MM-DD HH:MM:SS") en lisible FR
-    let dateHeure = a.created_at || '';
-    try {
-      if (dateHeure) {
-        const d = new Date(dateHeure.replace(' ', 'T') + 'Z');
-        dateHeure = d.toLocaleString('fr-FR', { timeZone: 'Europe/Paris', day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit' });
-      }
-    } catch (_) {}
+  const corps = document.getElementById('appelsBody');
+  if (!id) { corps.innerHTML = '<tr><td colspan="12" class="hint">Sélectionne une campagne.</td></tr>'; document.getElementById('appelsCompteur').textContent=''; return; }
+  corps.innerHTML = '<tr><td colspan="12" class="hint">Chargement…</td></tr>';
+  try {
+    const reponse = await apiFetch(`/api/campagnes/${id}/appels`);
+    derniersAppels = normaliserListe(reponse, ['results']);
+    rendreAppels();
+  } catch (e) {
+    corps.innerHTML = `<tr><td colspan="12"><div class="erreur-msg">Erreur : ${echapperHtml(e.message)}</div></td></tr>`;
+  }
+}
+
+function rendreAppels() {
+  const corps = document.getElementById('appelsBody');
+  const filtreStatut = document.getElementById('filtreStatutAppel').value;
+  const recherche = (document.getElementById('rechercheAppel').value || '').trim();
+  let appels = derniersAppels;
+  if (filtreStatut) appels = appels.filter(a => a.statut === filtreStatut);
+  if (recherche) appels = appels.filter(a => (a.phone||'').includes(recherche));
+
+  document.getElementById('appelsCompteur').textContent = `${appels.length} appel(s) affiché(s) sur ${derniersAppels.length} au total.`;
+
+  corps.innerHTML = appels.length ? appels.map(a => {
+    const tours = num(a.tours);
+    const messageLu          = tours >= 1;
+    const messageRepondeurLu = !!a.repondeur_detecte && messageLu;
+    const messageHumainLu    = !a.repondeur_detecte && messageLu;
+    const oui = '<span class="badge oui">Oui</span>';
+    const non = '<span class="badge non">Non</span>';
+    const bloque = a.statut === 'en_cours' || a.statut === 'repondu';
     return `
     <tr class="cliquable" onclick="ouvrirAppel('${a.call_uuid}')">
-      <td style="white-space:nowrap;font-size:11px;">${dateHeure}</td>
-      <td>${a.phone}</td>
+      <td style="white-space:nowrap;font-size:11px;">${formaterDateHeure(a.created_at)}</td>
+      <td>${echapperHtml(a.phone || '')}</td>
+      <td>${echapperHtml(a.pays || '—')}</td>
+      <td>${echapperHtml(a.langue || '—')}</td>
       <td><span class="badge ${a.statut}">${a.statut}</span></td>
-      <td>${a.rdv_pris ? '<span class="badge rdv">RDV</span>' : ''}</td>
-      <td>${a.duree_secondes}s</td>
-      <td>${a.statut === 'en_cours'
+      <td>${a.repondeur_detecte ? oui : non}</td>
+      <td>${messageHumainLu ? oui : non}</td>
+      <td>${messageRepondeurLu ? oui : non}</td>
+      <td>${messageLu ? oui : non}</td>
+      <td>${tours}</td>
+      <td>${num(a.duree_secondes)}s</td>
+      <td>${bloque
         ? `<button class="small orange" onclick="event.stopPropagation();cloturerAppel('${a.call_uuid}')">Clôturer</button>`
         : ''}</td>
     </tr>`;
-  }).join('') : '<tr><td colspan="6" class="hint">Aucun appel.</td></tr>';
+  }).join('') : '<tr><td colspan="12" class="hint">Aucun appel ne correspond.</td></tr>';
 }
 
 async function cloturerAppel(callUuid) {
   if (!confirm('Clôturer cet appel bloqué et le passer en "annulé" ?')) return;
-  await appelJson(`/api/appels/${callUuid}/cloturer`, { method: 'POST' });
-  chargerAppels();
+  try {
+    await apiFetch(`/api/appels/${callUuid}/cloturer`, { method: 'POST' });
+    await chargerAppels();
+  } catch (e) { alert('Erreur : ' + e.message); }
 }
 
 async function nettoyerBlockes() {
-  const res = await appelJson('/api/maintenance/nettoyer', { method: 'POST' });
-  alert(`${res.nettoyes} appel(s) bloqué(s) clôturé(s).`);
-  chargerAppels();
+  try {
+    const res = await apiFetch('/api/maintenance/nettoyer', { method: 'POST' });
+    alert(`${num(res && res.nettoyes)} appel(s) bloqué(s) clôturé(s).`);
+    await chargerAppels();
+    await chargerStatsRapport();
+    await chargerDashboard();
+  } catch (e) { alert('Erreur : ' + e.message); }
 }
 
-async function exporterCsv() {
+function exporterCsv() {
   const id = document.getElementById('rapportsCampagneSelect').value;
   if (!id) return alert('Sélectionne une campagne.');
   const { url, key } = cfg();
@@ -938,10 +1344,15 @@ async function exporterCsv() {
 }
 
 async function ouvrirAppel(callUuid) {
-  const a = await appelJson(`/api/appels/${callUuid}`);
-  const transcript = (a.transcription || []).map(t =>
-    `<div class="transcript-line ${t.role}">${t.role==='agent'?'🟦 Agent':'🟩 Prospect'} — ${t.texte}</div>`
-  ).join('') || '<span class="hint">Pas de transcription.</span>';
+  let a;
+  try { a = await apiFetch(`/api/appels/${callUuid}`); }
+  catch (e) { alert('Erreur : ' + e.message); return; }
+
+  const tours = num(a.tours);
+  const messageLu          = tours >= 1;
+  const messageRepondeurLu = !!a.repondeur_detecte && messageLu;
+  const messageHumainLu    = !a.repondeur_detecte && messageLu;
+
   let dateHeureDetail = a.created_at || '';
   try {
     if (dateHeureDetail) {
@@ -949,20 +1360,31 @@ async function ouvrirAppel(callUuid) {
       dateHeureDetail = d.toLocaleString('fr-FR', { timeZone: 'Europe/Paris', weekday:'long', day:'2-digit', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' });
     }
   } catch (_) {}
+
+  // Sections legacy (conversation IA) : affichées uniquement si elles contiennent réellement une donnée,
+  // pour ne pas polluer l'écran en mode message unique où elles restent vides.
+  const sectionsLegacy = [
+    ['Résultat', a.resultat], ['Résumé', a.resume_ia], ['Points forts', a.points_forts],
+    ['Points importants', a.points_importants], ['Objections', a.objections], ['Infos utiles', a.infos_utiles],
+  ].filter(([, v]) => v && String(v).trim());
+
+  const transcript = (a.transcription || []).map(t =>
+    `<div class="transcript-line ${t.role}">${t.role==='agent'?'🟦 Agent':'🟩 Prospect'} — ${echapperHtml(t.texte)}</div>`
+  ).join('');
+
   document.getElementById('modalAppelContenu').innerHTML = `
-    <h3>${a.phone} ${a.rdv_pris ? '<span class="badge rdv">RDV PRIS</span>' : ''}</h3>
+    <h3>${echapperHtml(a.phone || '')}</h3>
     <div class="modal-section"><b>Date et heure</b>${dateHeureDetail || '—'}</div>
-    <div class="modal-section"><b>Statut</b>${a.statut} ${a.repondeur_detecte?'(répondeur)':''}</div>
-    <div class="modal-section"><b>Pays / Langue</b>${a.pays||''} / ${a.langue||''}</div>
-    <div class="modal-section"><b>Durée</b>${a.duree_secondes}s — ${a.tours} tour(s)</div>
-    <div class="modal-section"><b>Résultat</b>${a.resultat||'—'}</div>
-    <div class="modal-section"><b>Résumé</b>${a.resume_ia||'—'}</div>
-    <div class="modal-section"><b>Points forts</b>${a.points_forts||'—'}</div>
-    <div class="modal-section"><b>Points importants</b>${a.points_importants||'—'}</div>
-    <div class="modal-section"><b>Objections</b>${a.objections||'—'}</div>
-    <div class="modal-section"><b>Infos utiles</b>${a.infos_utiles||'—'}</div>
-    <div class="modal-section"><b>Transcription</b>${transcript}</div>
-    ${a.statut==='en_cours'?`<button class="orange" onclick="cloturerAppel('${callUuid}');fermerModal()">Clôturer cet appel bloqué</button>`:''}
+    <div class="modal-section"><b>Statut</b><span class="badge ${a.statut}">${a.statut}</span></div>
+    <div class="modal-section"><b>Pays / Langue</b>${a.pays||'—'} / ${a.langue||'—'}</div>
+    <div class="modal-section"><b>Répondeur détecté</b>${a.repondeur_detecte ? '<span class="badge oui">Oui</span>' : '<span class="badge non">Non</span>'}</div>
+    <div class="modal-section"><b>Message humain lu</b>${messageHumainLu ? '<span class="badge oui">Oui</span>' : '<span class="badge non">Non</span>'}</div>
+    <div class="modal-section"><b>Message répondeur laissé</b>${messageRepondeurLu ? '<span class="badge oui">Oui</span>' : '<span class="badge non">Non</span>'}</div>
+    <div class="modal-section"><b>Durée</b>${num(a.duree_secondes)}s — ${tours} tour(s)</div>
+    ${sectionsLegacy.map(([label, val]) => `<div class="modal-section"><b>${label}</b>${echapperHtml(String(val))}</div>`).join('')}
+    ${transcript ? `<div class="modal-section"><b>Historique du message lu</b>${transcript}</div>` : ''}
+    <div class="modal-section"><b>Identifiant technique (diagnostic)</b><span class="hint">${echapperHtml(callUuid)}</span></div>
+    ${(a.statut==='en_cours' || a.statut==='repondu') ? `<button class="orange" onclick="cloturerAppel('${callUuid}');fermerModal()">Clôturer cet appel bloqué</button>` : ''}
     <button class="secondaire" onclick="fermerModal()">Fermer</button>`;
   document.getElementById('modalAppel').classList.add('active');
 }
@@ -972,7 +1394,7 @@ function fermerModal() { document.getElementById('modalAppel').classList.remove(
 // ─────────────────────────────────────────────────────────────
 // NOTES
 // ─────────────────────────────────────────────────────────────
-function echapperHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function echapperHtml(s) { return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function linkify(texte)   { return texte.replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>'); }
 
 async function ajouterNote() {
@@ -980,19 +1402,26 @@ async function ajouterNote() {
   const texte = champ.value.trim();
   if (!texte) return alert('Écris un texte avant d\'ajouter.');
   try {
-    await appelJson('/api/notes', { method:'POST', body:JSON.stringify({texte}) });
+    await apiFetch('/api/notes', { method:'POST', body:JSON.stringify({texte}) });
     champ.value = '';
     chargerNotes();
   } catch(e) { alert('Erreur : '+e.message); }
 }
 
 async function chargerNotes() {
-  const notes = await appelJson('/api/notes');
+  let notes = [];
+  try {
+    const reponse = await apiFetch('/api/notes');
+    notes = normaliserListe(reponse, ['results', 'notes']);
+  } catch (e) {
+    document.getElementById('listeNotes').innerHTML = `<div class="erreur-msg">Erreur : ${echapperHtml(e.message)}</div>`;
+    return;
+  }
   document.getElementById('listeNotes').innerHTML = notes.map(n => {
-    const lignes = n.texte.split('\n');
+    const lignes = (n.texte || '').split('\n');
     const aTitre = lignes[0].startsWith('# ');
     const titre  = aTitre ? lignes[0].slice(2).trim() : '';
-    const corps  = aTitre ? lignes.slice(1).join('\n').trim() : n.texte;
+    const corps  = aTitre ? lignes.slice(1).join('\n').trim() : (n.texte || '');
     return `<div class="carte-note">
       <input class="note-titre-edit" id="note-titre-${n.id}" value="${echapperHtml(titre)}" placeholder="Titre (optionnel)" />
       <div class="note-rendu">${linkify(echapperHtml(corps))}</div>
@@ -1015,13 +1444,13 @@ async function enregistrerNote(id) {
   if (!corps) return alert('Le contenu ne peut pas être vide.');
   const texte = titre ? `# ${titre}\n${corps}` : corps;
   try {
-    await appelJson(`/api/notes/${id}`, { method:'PUT', body:JSON.stringify({texte}) });
+    await apiFetch(`/api/notes/${id}`, { method:'PUT', body:JSON.stringify({texte}) });
     chargerNotes();
   } catch(e) { alert('Erreur : '+e.message); }
 }
 
 async function supprimerNote(id) {
-  try { await appel(`/api/notes/${id}`, { method:'DELETE' }); chargerNotes(); }
+  try { await apiFetch(`/api/notes/${id}`, { method:'DELETE' }); chargerNotes(); }
   catch(e) { alert('Erreur : '+e.message); }
 }
 
@@ -1037,7 +1466,7 @@ async function ajouterLien() {
   const lien_url = document.getElementById('nouveauLienUrl').value.trim();
   if (!lien_url) return alert('URL requise.');
   try {
-    await appelJson('/api/liens', { method:'POST', body:JSON.stringify({libelle, lien_url}) });
+    await apiFetch('/api/liens', { method:'POST', body:JSON.stringify({libelle, lien_url}) });
     document.getElementById('nouveauLienLibelle').value = '';
     document.getElementById('nouveauLienUrl').value     = '';
     chargerLiens();
@@ -1045,7 +1474,14 @@ async function ajouterLien() {
 }
 
 async function chargerLiens() {
-  const liens = await appelJson('/api/liens');
+  let liens = [];
+  try {
+    const reponse = await apiFetch('/api/liens');
+    liens = normaliserListe(reponse, ['results', 'liens']);
+  } catch (e) {
+    document.getElementById('listeLiens').innerHTML = `<div class="erreur-msg">Erreur : ${echapperHtml(e.message)}</div>`;
+    return;
+  }
   document.getElementById('listeLiens').innerHTML = liens.map(l => `
     <div class="lien-ligne">
       <a class="lien-ouvrir" href="${echapperHtml(l.url)}" target="_blank" rel="noopener" title="${echapperHtml(l.url)}">
@@ -1077,13 +1513,13 @@ async function enregistrerLien(id) {
   const lien_url = (document.getElementById(`lien-url-${id}`)?.value||'').trim();
   if (!lien_url) return alert('URL requise.');
   try {
-    await appelJson(`/api/liens/${id}`, { method:'PUT', body:JSON.stringify({libelle, lien_url}) });
+    await apiFetch(`/api/liens/${id}`, { method:'PUT', body:JSON.stringify({libelle, lien_url}) });
     chargerLiens();
   } catch(e) { alert('Erreur : '+e.message); }
 }
 
 async function supprimerLien(id) {
-  try { await appel(`/api/liens/${id}`, { method:'DELETE' }); chargerLiens(); }
+  try { await apiFetch(`/api/liens/${id}`, { method:'DELETE' }); chargerLiens(); }
   catch(e) { alert('Erreur : '+e.message); }
 }
 </script>
