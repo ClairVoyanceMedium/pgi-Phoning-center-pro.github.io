@@ -91,6 +91,8 @@
   .badge.annule, .badge.timeout, .badge.erreur { background: #ff4d6d22; color: var(--err); }
   .badge.oui { background:#2ee87a22; color:var(--ok); }
   .badge.non { background:#8b94a022; color:var(--texte-dim); }
+  .badge.repondeurmsg { background:#b758ff22; color:var(--violet); }
+  .badge.humainmsg { background:#34c8ff22; color:var(--cyan); }
 
   table { width: 100%; border-collapse: collapse; font-size: 12px; }
   th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--border); }
@@ -231,7 +233,7 @@
       <textarea id="campDirectives" rows="2"></textarea>
       <label><input type="checkbox" id="campRepondeurActif" checked /> Message répondeur distinct</label>
       <p class="hint">Le détecteur de répondeur (AMD Telnyx) est <b>toujours activé</b> sur tous les appels, quelle que soit cette case. Elle sert uniquement à indiquer si le message ci-dessous doit être utilisé lorsqu'un répondeur est détecté (sinon l'introduction sera relue).</p>
-      <label>Message répondeur — <b>lu tel quel après le bip</b></label>
+      <label>Message répondeur — <b>lu tel quel après le bip ou par défaut sur les décrochés lents</b></label>
       <textarea id="campRepondeurMessage" rows="3" placeholder="Message lu après le bip du répondeur"></textarea>
       <input type="hidden" id="campPrestataireVoix" value="telnyx" />
       <p class="hint">🔊 Voix : Telnyx speak natif (aucun autre moteur vocal n'est utilisé en mode message unique).</p>
@@ -362,10 +364,10 @@
         <table style="margin-top:10px;">
           <thead><tr>
             <th>Date / Heure</th><th>Téléphone</th><th>Pays</th><th>Langue</th><th>Statut</th>
-            <th>Répondeur</th><th>Msg humain</th><th>Msg répondeur</th><th>Msg lu</th>
+            <th>Type de message</th><th>Msg lu</th>
             <th>Tours</th><th>Durée</th><th>Action</th>
           </tr></thead>
-          <tbody id="appelsBody"><tr><td colspan="12" class="hint">Sélectionne une campagne.</td></tr></tbody>
+          <tbody id="appelsBody"><tr><td colspan="10" class="hint">Sélectionne une campagne.</td></tr></tbody>
         </table>
       </div>
       <p class="hint" id="appelsCompteur"></p>
@@ -428,6 +430,12 @@
       <div id="statutTelnyxBox" class="hint">Charge la config puis reviens ici.</div>
     </div>
 
+    <div class="panel c-cyan">
+      <h2>Réglages de détection (Worker)</h2>
+      <div id="reglagesDetectionBox" class="hint">Charge la config puis reviens ici.</div>
+      <p class="hint">Ces valeurs sont définies côté Worker (variables d'environnement Cloudflare). Cet écran les affiche à titre informatif — modifie-les dans le dashboard Cloudflare si besoin.</p>
+    </div>
+
     <div class="panel c-turquoise">
       <h2>💡 Astuces pour alléger la facture Telnyx</h2>
       <div class="astuce-box">
@@ -436,8 +444,7 @@
         <b>Le raccrochage est automatique dès la fin du message</b> (garde-fou dur) : aucun appel ne reste "ouvert" à ne rien faire, ce qui évite de payer du silence facturé.<br/><br/>
         <b>Nettoyage régulier des appels bloqués.</b> Utilise le bouton "🧹 Nettoyer bloqués" (ou laisse le cron faire son travail) : un appel qui reste bloqué côté D1 n'est pas forcément raccroché côté Telnyx si un webhook a été manqué — vérifie régulièrement dans l'onglet Rapports.<br/><br/>
         <b>Cible tes créneaux horaires.</b> Limiter les appels aux heures où les gens décrochent réellement réduit le nombre d'appels "sans réponse" facturés pour rien.<br/><br/>
-        <b>Vérifie tes numéros avant import.</b> Un numéro invalide ou mal formaté qui part quand même en appel = minute facturée pour un appel voué à l'échec. Le nettoyage automatique des numéros à l'import limite ce risque.<br/><br/>
-        <b>Voix "male + premium" vs voix standard.</b> Le Worker essaie d'abord la voix premium Telnyx, avec repli automatique. Si le coût de la voix premium te pèse, tu peux demander à ce que le Worker essaie d'abord la voix standard (économie possible, qualité audio légèrement différente) — c'est un réglage côté Worker, pas dans cette interface.
+        <b>Sonnerie longue = normal et voulu.</b> Le temps de sonnerie non décroché n'est en général pas facturé par Telnyx — un temps de sonnerie plus long (45s) est nécessaire pour laisser le temps aux répondeurs opérateur de décrocher automatiquement, sans coût supplémentaire réel.
       </div>
     </div>
   </section>
@@ -494,7 +501,7 @@
     <label>Directives comportementales</label><textarea id="editDirectives" rows="2"></textarea>
     <label><input type="checkbox" id="editRepondeurActif" /> Message répondeur distinct</label>
     <p class="hint">Le détecteur de répondeur (AMD) est toujours actif côté Worker. Cette case indique seulement si le message ci-dessous doit être utilisé au lieu de relire l'introduction.</p>
-    <label>Message répondeur — lu tel quel après le bip</label><textarea id="editRepondeurMessage" rows="3"></textarea>
+    <label>Message répondeur — lu après le bip ou par défaut sur les décrochés lents</label><textarea id="editRepondeurMessage" rows="3"></textarea>
     <input type="hidden" id="editPrestataireVoix" value="telnyx" />
     <div class="row">
       <div><label>Ordre des appels</label>
@@ -583,7 +590,7 @@ function changerVue(nom) {
   if (nom === 'liens')     chargerLiens();
   if (nom === 'listes')    chargerListes();
   if (nom === 'campagnes') chargerCampagnes();
-  if (nom === 'config')    chargerStatutTelnyx();
+  if (nom === 'config')    { chargerStatutTelnyx(); chargerReglagesDetection(); }
 }
 
 window.addEventListener('load', () => {
@@ -640,11 +647,9 @@ async function apiFetch(chemin, options = {}) {
   return data;
 }
 
-// Compat rétro : anciens noms utilisés partout dans le fichier
 async function appel(chemin, options) { const d = await apiFetch(chemin, options); return { json: async () => d, ok: true }; }
 async function appelJson(chemin, options) { return apiFetch(chemin, options); }
 
-// Normalise n'importe quelle forme de réponse-liste en tableau JS.
 function normaliserListe(reponse, cles) {
   if (Array.isArray(reponse)) return reponse;
   if (reponse && typeof reponse === 'object') {
@@ -657,7 +662,7 @@ function normaliserListe(reponse, cles) {
 function num(v, def) { const n = Number(v); return Number.isFinite(n) ? n : (def ?? 0); }
 
 // ─────────────────────────────────────────────────────────────
-// ÉTAT DES CONNEXIONS (aligné Worker v7)
+// ÉTAT DES CONNEXIONS (aligné Worker v14)
 // ─────────────────────────────────────────────────────────────
 async function chargerEtat() {
   try {
@@ -702,6 +707,28 @@ async function chargerStatutTelnyx() {
       </p>`;
   } catch (e) {
     box.innerHTML = `<div class="erreur-msg">Impossible de charger le statut Telnyx : ${echapperHtml(e.message)}</div>`;
+  }
+}
+
+async function chargerReglagesDetection() {
+  const box = document.getElementById('reglagesDetectionBox');
+  try {
+    const e = await apiFetch('/api/etat');
+    const lignes = [
+      ['Sonnerie max avant abandon', e.telnyx_ring_timeout_secs, 's'],
+      ['Durée max d\'un appel', e.telnyx_max_call_seconds, 's'],
+      ['Seuil décroché "rapide"', e.ring_duree_suspecte_secs, 's'],
+      ['Délai avant parole (humain rapide)', e.human_message_delay_ms, 'ms'],
+      ['Délai filet anti-silence (décroché rapide)', e.human_amd_fallback_delay_ms, 'ms'],
+      ['Délai filet répondeur (décroché lent)', e.slow_answer_fallback_delay_ms, 'ms'],
+      ['Délai filet bip (répondeur confirmé)', e.machine_greeting_fallback_delay_ms, 'ms'],
+    ].filter(([, v]) => v !== undefined);
+    box.innerHTML = lignes.length ? `
+      <table><tbody>
+        ${lignes.map(([label, val, unite]) => `<tr><td>${label}</td><td style="text-align:right;font-weight:700;color:var(--cyan);">${val}${unite}</td></tr>`).join('')}
+      </tbody></table>` : '<p class="hint">Aucun réglage détaillé renvoyé par ce Worker.</p>';
+  } catch (e) {
+    box.innerHTML = `<div class="erreur-msg">Erreur : ${echapperHtml(e.message)}</div>`;
   }
 }
 
@@ -809,11 +836,10 @@ async function chargerListes() {
     if (sel) { const v = sel.value; sel.innerHTML = options; if (v && [...sel.options].some(o => o.value === v)) sel.value = v; }
   });
 
-  // Vue d'ensemble contacts (onglet Contacts)
   const totalListes    = listes.length;
   const totalContacts  = listes.reduce((s, l) => s + num(l.nb_contacts), 0);
   const totalAAppeler  = listes.reduce((s, l) => s + num(l.nb_a_appeler), 0);
-  const totalAutres    = Math.max(0, totalContacts - totalAAppeler); // appelé + en_cours combinés
+  const totalAutres    = Math.max(0, totalContacts - totalAAppeler);
   document.getElementById('statsContactsGlobal').innerHTML = `
     <div class="stat" style="border-top-color:var(--orange)"><div class="valeur" style="color:var(--orange)">${totalListes}</div><div class="libelle">Listes</div></div>
     <div class="stat" style="border-top-color:var(--cyan)"><div class="valeur" style="color:var(--cyan)">${totalContacts}</div><div class="libelle">Contacts total</div></div>
@@ -883,7 +909,7 @@ function parserTextePaste(texte) {
   });
 }
 
-const CHUNK_FRONT = 5000; // contacts envoyés par requête API (Worker les traite par 500)
+const CHUNK_FRONT = 5000;
 
 async function importerAvecRetour(listeId, contacts, langue_defaut, boutonId) {
   const msg = document.getElementById('importMsg');
@@ -893,7 +919,6 @@ async function importerAvecRetour(listeId, contacts, langue_defaut, boutonId) {
   try {
     const total = await importerChunks(listeId, contacts, langue_defaut);
     msg.innerHTML = `<div class="succes-msg">✓ ${total} contact(s) importé(s) sur ${contacts.length} lu(s).</div>`;
-    // Recharge immédiate : listes (compteurs) + contacts affichés si c'est la liste consultée
     await chargerListes();
     if (document.getElementById('listeSelectView').value == listeId) {
       await afficherContactsListe(listeId, 1);
@@ -1079,11 +1104,10 @@ async function supprimerCampagne(id, nom) {
   } catch (e) { alert('Erreur : ' + e.message); }
 }
 
-// Verrou anti double-clic (le Worker reste la sécurité principale via D1)
 const campagnesEnLancement = new Set();
 
 async function lancerCampagne(id, force, btnEl) {
-  if (campagnesEnLancement.has(id)) return; // déjà en cours de lancement, on ignore le clic
+  if (campagnesEnLancement.has(id)) return;
   campagnesEnLancement.add(id);
   const btn = btnEl || document.getElementById('btnLancer-' + id);
   const texteOriginal = btn ? btn.textContent : null;
@@ -1174,7 +1198,7 @@ async function sauvegarderModif() {
 }
 
 // ─────────────────────────────────────────────────────────────
-// STATS — rendu générique aligné sur le Worker v7
+// STATS — rendu générique aligné sur le Worker v14
 // ─────────────────────────────────────────────────────────────
 const DEFS_STATS_GLOBALES = [
   ['total','Appels lancés','cyan'], ['decroches','Décrochés / messages lus','vert'],
@@ -1198,7 +1222,6 @@ const DEFS_STATS_DUREE = [
 function rendreStats(conteneurId, s, options) {
   options = options || {};
   s = s || {};
-  const neon = (hex) => `text-shadow: 0 0 8px ${hex}99, 0 0 18px ${hex}44`;
   const couleurCss = c => c === 'texte-dim' ? 'var(--texte-dim)' : `var(--${c})`;
   let html = '';
   for (const [cle, libelle, couleur] of DEFS_STATS_GLOBALES) {
@@ -1266,17 +1289,31 @@ function formaterDateHeure(brut) {
   } catch (_) { return brut; }
 }
 
+// IMPORTANT (compatibilité Worker v11+) : la classification "message
+// répondeur" vs "message humain" repose désormais sur le champ `resultat`
+// ('repondeur' ou 'humain_confirme'), et non plus sur `repondeur_detecte`
+// seul — ce dernier peut être à 1 même sur des appels finalement traités
+// comme humains (ex: AMD "not_sure" corrigé). Toujours se baser sur
+// `resultat` pour cet affichage.
+function classifierMessage(a) {
+  const tours = num(a.tours);
+  const messageLu = tours >= 1;
+  const messageRepondeurLu = a.resultat === 'repondeur';
+  const messageHumainLu = messageLu && !messageRepondeurLu;
+  return { messageLu, messageRepondeurLu, messageHumainLu };
+}
+
 async function chargerAppels() {
   const id = document.getElementById('rapportsCampagneSelect').value;
   const corps = document.getElementById('appelsBody');
-  if (!id) { corps.innerHTML = '<tr><td colspan="12" class="hint">Sélectionne une campagne.</td></tr>'; document.getElementById('appelsCompteur').textContent=''; return; }
-  corps.innerHTML = '<tr><td colspan="12" class="hint">Chargement…</td></tr>';
+  if (!id) { corps.innerHTML = '<tr><td colspan="10" class="hint">Sélectionne une campagne.</td></tr>'; document.getElementById('appelsCompteur').textContent=''; return; }
+  corps.innerHTML = '<tr><td colspan="10" class="hint">Chargement…</td></tr>';
   try {
     const reponse = await apiFetch(`/api/campagnes/${id}/appels`);
     derniersAppels = normaliserListe(reponse, ['results']);
     rendreAppels();
   } catch (e) {
-    corps.innerHTML = `<tr><td colspan="12"><div class="erreur-msg">Erreur : ${echapperHtml(e.message)}</div></td></tr>`;
+    corps.innerHTML = `<tr><td colspan="10"><div class="erreur-msg">Erreur : ${echapperHtml(e.message)}</div></td></tr>`;
   }
 }
 
@@ -1291,12 +1328,12 @@ function rendreAppels() {
   document.getElementById('appelsCompteur').textContent = `${appels.length} appel(s) affiché(s) sur ${derniersAppels.length} au total.`;
 
   corps.innerHTML = appels.length ? appels.map(a => {
-    const tours = num(a.tours);
-    const messageLu          = tours >= 1;
-    const messageRepondeurLu = !!a.repondeur_detecte && messageLu;
-    const messageHumainLu    = !a.repondeur_detecte && messageLu;
-    const oui = '<span class="badge oui">Oui</span>';
-    const non = '<span class="badge non">Non</span>';
+    const { messageLu, messageRepondeurLu, messageHumainLu } = classifierMessage(a);
+    const typeMsg = messageRepondeurLu
+      ? '<span class="badge repondeurmsg">Répondeur</span>'
+      : messageHumainLu
+        ? '<span class="badge humainmsg">Humain</span>'
+        : '<span class="badge non">Aucun</span>';
     const bloque = a.statut === 'en_cours' || a.statut === 'repondu';
     return `
     <tr class="cliquable" onclick="ouvrirAppel('${a.call_uuid}')">
@@ -1305,17 +1342,15 @@ function rendreAppels() {
       <td>${echapperHtml(a.pays || '—')}</td>
       <td>${echapperHtml(a.langue || '—')}</td>
       <td><span class="badge ${a.statut}">${a.statut}</span></td>
-      <td>${a.repondeur_detecte ? oui : non}</td>
-      <td>${messageHumainLu ? oui : non}</td>
-      <td>${messageRepondeurLu ? oui : non}</td>
-      <td>${messageLu ? oui : non}</td>
-      <td>${tours}</td>
+      <td>${typeMsg}</td>
+      <td>${messageLu ? '<span class="badge oui">Oui</span>' : '<span class="badge non">Non</span>'}</td>
+      <td>${num(a.tours)}</td>
       <td>${num(a.duree_secondes)}s</td>
       <td>${bloque
         ? `<button class="small orange" onclick="event.stopPropagation();cloturerAppel('${a.call_uuid}')">Clôturer</button>`
         : ''}</td>
     </tr>`;
-  }).join('') : '<tr><td colspan="12" class="hint">Aucun appel ne correspond.</td></tr>';
+  }).join('') : '<tr><td colspan="10" class="hint">Aucun appel ne correspond.</td></tr>';
 }
 
 async function cloturerAppel(callUuid) {
@@ -1348,10 +1383,7 @@ async function ouvrirAppel(callUuid) {
   try { a = await apiFetch(`/api/appels/${callUuid}`); }
   catch (e) { alert('Erreur : ' + e.message); return; }
 
-  const tours = num(a.tours);
-  const messageLu          = tours >= 1;
-  const messageRepondeurLu = !!a.repondeur_detecte && messageLu;
-  const messageHumainLu    = !a.repondeur_detecte && messageLu;
+  const { messageLu, messageRepondeurLu, messageHumainLu } = classifierMessage(a);
 
   let dateHeureDetail = a.created_at || '';
   try {
@@ -1361,10 +1393,8 @@ async function ouvrirAppel(callUuid) {
     }
   } catch (_) {}
 
-  // Sections legacy (conversation IA) : affichées uniquement si elles contiennent réellement une donnée,
-  // pour ne pas polluer l'écran en mode message unique où elles restent vides.
   const sectionsLegacy = [
-    ['Résultat', a.resultat], ['Résumé', a.resume_ia], ['Points forts', a.points_forts],
+    ['Résumé', a.resume_ia], ['Points forts', a.points_forts],
     ['Points importants', a.points_importants], ['Objections', a.objections], ['Infos utiles', a.infos_utiles],
   ].filter(([, v]) => v && String(v).trim());
 
@@ -1377,10 +1407,14 @@ async function ouvrirAppel(callUuid) {
     <div class="modal-section"><b>Date et heure</b>${dateHeureDetail || '—'}</div>
     <div class="modal-section"><b>Statut</b><span class="badge ${a.statut}">${a.statut}</span></div>
     <div class="modal-section"><b>Pays / Langue</b>${a.pays||'—'} / ${a.langue||'—'}</div>
-    <div class="modal-section"><b>Répondeur détecté</b>${a.repondeur_detecte ? '<span class="badge oui">Oui</span>' : '<span class="badge non">Non</span>'}</div>
-    <div class="modal-section"><b>Message humain lu</b>${messageHumainLu ? '<span class="badge oui">Oui</span>' : '<span class="badge non">Non</span>'}</div>
-    <div class="modal-section"><b>Message répondeur laissé</b>${messageRepondeurLu ? '<span class="badge oui">Oui</span>' : '<span class="badge non">Non</span>'}</div>
-    <div class="modal-section"><b>Durée</b>${num(a.duree_secondes)}s — ${tours} tour(s)</div>
+    <div class="modal-section"><b>Type de message lu</b>${
+      messageRepondeurLu ? '<span class="badge repondeurmsg">Message répondeur</span>'
+      : messageHumainLu ? '<span class="badge humainmsg">Message humain</span>'
+      : '<span class="badge non">Aucun message lu</span>'
+    }</div>
+    <div class="modal-section"><b>Répondeur détecté (AMD)</b>${a.repondeur_detecte ? '<span class="badge oui">Oui</span>' : '<span class="badge non">Non</span>'}</div>
+    <div class="modal-section"><b>Durée</b>${num(a.duree_secondes)}s — ${num(a.tours)} tour(s)</div>
+    ${a.resultat ? `<div class="modal-section"><b>Résultat technique (diagnostic)</b><span class="hint">${echapperHtml(a.resultat)}</span></div>` : ''}
     ${sectionsLegacy.map(([label, val]) => `<div class="modal-section"><b>${label}</b>${echapperHtml(String(val))}</div>`).join('')}
     ${transcript ? `<div class="modal-section"><b>Historique du message lu</b>${transcript}</div>` : ''}
     <div class="modal-section"><b>Identifiant technique (diagnostic)</b><span class="hint">${echapperHtml(callUuid)}</span></div>
