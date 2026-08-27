@@ -232,9 +232,9 @@
       <label>Directives comportementales</label>
       <textarea id="campDirectives" rows="2"></textarea>
       <label><input type="checkbox" id="campRepondeurActif" checked /> Message répondeur distinct</label>
-      <p class="hint">Le détecteur de répondeur (AMD Telnyx) est <b>toujours activé</b> sur tous les appels, quelle que soit cette case. Elle sert uniquement à indiquer si le message ci-dessous doit être utilisé lorsqu'un répondeur est détecté (sinon l'introduction sera relue).</p>
-      <label>Message répondeur — <b>lu tel quel après le bip ou par défaut sur les décrochés lents</b></label>
-      <textarea id="campRepondeurMessage" rows="3" placeholder="Message lu après le bip du répondeur"></textarea>
+      <p class="hint">Le détecteur de répondeur Telnyx est <b>toujours activé en mode greeting_end</b>. Il distingue humain/répondeur puis attend la fin de l’annonce par bip ou silence. Cette case sert uniquement à choisir le message répondeur distinct ; si elle est décochée, l’introduction est relue.</p>
+      <label>Message répondeur — <b>lu tel quel après la fin de l’annonce détectée par bip ou silence</b></label>
+      <textarea id="campRepondeurMessage" rows="3" placeholder="Message lu après la fin de l’annonce du répondeur"></textarea>
       <input type="hidden" id="campPrestataireVoix" value="telnyx" />
       <p class="hint">🔊 Voix : Telnyx speak natif (aucun autre moteur vocal n'est utilisé en mode message unique).</p>
       <div class="row">
@@ -500,8 +500,8 @@
     <label>Capacités commerciales</label><textarea id="editCapacites" rows="2"></textarea>
     <label>Directives comportementales</label><textarea id="editDirectives" rows="2"></textarea>
     <label><input type="checkbox" id="editRepondeurActif" /> Message répondeur distinct</label>
-    <p class="hint">Le détecteur de répondeur (AMD) est toujours actif côté Worker. Cette case indique seulement si le message ci-dessous doit être utilisé au lieu de relire l'introduction.</p>
-    <label>Message répondeur — lu après le bip ou par défaut sur les décrochés lents</label><textarea id="editRepondeurMessage" rows="3"></textarea>
+    <p class="hint">Le détecteur de répondeur (AMD) est toujours actif côté Worker en mode greeting_end. Cette case indique seulement si le message ci-dessous doit être utilisé au lieu de relire l'introduction.</p>
+    <label>Message répondeur — lu après la fin de l’annonce détectée par bip ou silence</label><textarea id="editRepondeurMessage" rows="3"></textarea>
     <input type="hidden" id="editPrestataireVoix" value="telnyx" />
     <div class="row">
       <div><label>Ordre des appels</label>
@@ -673,7 +673,7 @@ async function chargerEtat() {
       ['telephonie_telnyx', 'Telnyx'],
       ['url_base_configuree', 'URL cron'],
       ['mode_message_unique', 'Message unique'],
-      ['amd_detect_beep_systematique', 'AMD systématique'],
+      ['amd_greeting_end_systematique', 'AMD greeting_end'],
     ];
     let html = items.map(([k, libelle]) => `<span class="puce ${e[k] ? 'ok' : 'off'}">${libelle}</span>`).join('');
     if ('appels_actifs' in e) {
@@ -717,11 +717,9 @@ async function chargerReglagesDetection() {
     const lignes = [
       ['Sonnerie max avant abandon', e.telnyx_ring_timeout_secs, 's'],
       ['Durée max d\'un appel', e.telnyx_max_call_seconds, 's'],
-      ['Seuil décroché "rapide"', e.ring_duree_suspecte_secs, 's'],
-      ['Délai avant parole (humain rapide)', e.human_message_delay_ms, 'ms'],
-      ['Délai filet anti-silence (décroché rapide)', e.human_amd_fallback_delay_ms, 'ms'],
-      ['Délai filet répondeur (décroché lent)', e.slow_answer_fallback_delay_ms, 'ms'],
-      ['Délai filet bip (répondeur confirmé)', e.machine_greeting_fallback_delay_ms, 'ms'],
+      ['Mode AMD', e.amd_mode, ''],
+      ['Fallback humain anticipé', e.human_early_fallback_enabled ? 'ACTIF' : 'DÉSACTIVÉ', ''],
+      ['Stratégie répondeur', e.strategie_repondeur, ''],
     ].filter(([, v]) => v !== undefined);
     box.innerHTML = lignes.length ? `
       <table><tbody>
