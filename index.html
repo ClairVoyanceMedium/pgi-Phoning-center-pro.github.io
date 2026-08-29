@@ -274,6 +274,13 @@
       <div class="stats-grid" id="statsContactsGlobal"></div>
       <button class="danger" id="btnResetSuiviContacts" onclick="remettreSuiviContactsAZero()" style="margin-top:12px;" disabled>Remettre le suivi de cette liste à zéro</button>
       <p class="hint" id="statsContactsNote">Les chiffres correspondent uniquement à la liste sélectionnée ci-dessous.</p>
+      <div class="astuce-box" style="margin-top:12px;">
+        <b>Pense-bête Cloudflare D1 — capacité contacts</b><br/>
+        <b>Workers Free :</b> 100 000 lignes écrites/jour, 5 millions de lignes lues/jour, 500 Mo maximum par base D1. Les quotas quotidiens se remettent à zéro à 00:00 UTC.<br/>
+        <b>Workers Paid :</b> jusqu’à 10 Go par base D1 ; les 50 premiers millions de lignes écrites/mois sont inclus.<br/>
+        <b>Import des contacts :</b> l’interface envoie automatiquement les contacts par paquets techniques de 5 000. Tu peux donc importer un fichier ou un collage de plus de 5 000 contacts en une seule opération : l’interface le découpe toute seule en plusieurs envois de 5 000. <b>5 000 n’est pas la limite de la liste.</b><br/>
+        <b>Nombre de contacts par liste :</b> pas de plafond fixe de lignes dans une table D1 ; la limite pratique dépend surtout de la taille totale de la base et des quotas d’écriture. En Free, garde en tête la limite de 100 000 lignes écrites par jour pour les nouveaux imports.
+      </div>
     </div>
 
     <div class="panel c-orange">
@@ -319,6 +326,8 @@
           <option value="appele">Appelé</option>
         </select>
         <button class="secondaire small" style="margin:0;" onclick="afficherContactsListe(document.getElementById('listeSelectView').value, contactsPageCourante)">🔄 Rafraîchir</button>
+        <button class="small danger" style="margin:0;" id="btnSupprimerTousContacts" onclick="supprimerTousContactsListe()">Supprimer tous les contacts</button>
+        <button class="small danger" style="margin:0;" id="btnSupprimerListeSelectionnee" onclick="supprimerListeSelectionnee()">Supprimer la liste</button>
       </div>
       <div class="table-scroll">
         <table style="margin-top:10px;">
@@ -916,6 +925,14 @@ async function remettreSuiviContactsAZero() {
   }
 }
 
+async function supprimerListeSelectionnee() {
+  const sel = document.getElementById('listeSelectView');
+  const id = sel ? String(sel.value || '') : '';
+  const liste = dernieresListes.find(l => String(l.id) === id);
+  if (!liste) return alert('Sélectionne d’abord une liste de contacts.');
+  await supprimerListe(liste.id, liste.nom || `Liste ${liste.id}`);
+}
+
 async function supprimerListe(id, nom) {
   if (!confirm(`Supprimer la liste "${nom}" et tous ses contacts ?\n\nAttention : cette action est irréversible.`)) return;
   try {
@@ -977,6 +994,45 @@ async function supprimerContact(contactId, listeId, phone) {
     await apiFetch(`/api/contacts/${contactId}`, { method: 'DELETE' });
     await chargerListes();
     await afficherContactsListe(listeId, contactsPageCourante);
+  } catch (e) {
+    alert('Erreur : ' + e.message);
+  }
+}
+
+async function supprimerTousContactsListe() {
+  const sel = document.getElementById('listeSelectView');
+  const id = sel ? String(sel.value || '') : '';
+  const liste = dernieresListes.find(l => String(l.id) === id);
+  if (!liste) return alert('Sélectionne d’abord une liste de contacts.');
+
+  const total = num(liste.nb_contacts);
+  const enCours = num(liste.nb_en_cours);
+
+  if (enCours > 0) {
+    return alert('Impossible de supprimer tous les contacts : un contact de cette liste est actuellement en cours d’appel.');
+  }
+
+  if (total <= 0) {
+    return alert('Cette liste ne contient déjà aucun contact.');
+  }
+
+  if (!confirm(
+    `Supprimer définitivement TOUS les ${total} contact(s) de la liste "${liste.nom || liste.id}" ?\n\n` +
+    `La liste elle-même sera conservée.\n` +
+    `Les anciens historiques d’appels seront conservés.\n\n` +
+    `Cette suppression des contacts est irréversible.`
+  )) return;
+
+  try {
+    const res = await apiFetch(`/api/listes/${id}/contacts/supprimer-tous`, {
+      method: 'POST',
+      body: JSON.stringify({ confirmer: true })
+    });
+    await chargerListes();
+    document.getElementById('listeSelectView').value = id;
+    rendreStatsContactsSelection();
+    await afficherContactsListe(id, 1);
+    alert(`${num(res?.contacts_supprimes, total)} contact(s) supprimé(s). La liste a été conservée.`);
   } catch (e) {
     alert('Erreur : ' + e.message);
   }
