@@ -270,9 +270,10 @@
   <!-- CONTACTS -->
   <section class="vue" id="vue-listes">
     <div class="panel c-orange">
-      <h2>Vue d'ensemble contacts</h2>
+      <h2>Vue d'ensemble contacts <small id="statsContactsListeNom">— sélectionne une liste —</small></h2>
       <div class="stats-grid" id="statsContactsGlobal"></div>
-      <p class="hint" id="statsContactsNote"></p>
+      <button class="danger" id="btnResetSuiviContacts" onclick="remettreSuiviContactsAZero()" style="margin-top:12px;" disabled>Remettre le suivi de cette liste à zéro</button>
+      <p class="hint" id="statsContactsNote">Les chiffres correspondent uniquement à la liste sélectionnée ci-dessous.</p>
     </div>
 
     <div class="panel c-orange">
@@ -309,7 +310,7 @@
     <div class="panel c-orange">
       <h2>Contacts d'une liste</h2>
       <label>Liste à consulter</label>
-      <select id="listeSelectView" onchange="afficherContactsListe(this.value, 1)"></select>
+      <select id="listeSelectView" onchange="selectionnerListeContacts(this.value)"></select>
       <div class="row" style="margin-top:6px;">
         <select id="filtreStatutContact" onchange="afficherContactsListe(document.getElementById('listeSelectView').value, 1)">
           <option value="">Tous les statuts</option>
@@ -836,18 +837,83 @@ async function chargerListes() {
     if (sel) { const v = sel.value; sel.innerHTML = options; if (v && [...sel.options].some(o => o.value === v)) sel.value = v; }
   });
 
-  const totalListes    = listes.length;
-  const totalContacts  = listes.reduce((s, l) => s + num(l.nb_contacts), 0);
-  const totalAAppeler  = listes.reduce((s, l) => s + num(l.nb_a_appeler), 0);
-  const totalAutres    = Math.max(0, totalContacts - totalAAppeler);
-  document.getElementById('statsContactsGlobal').innerHTML = `
-    <div class="stat" style="border-top-color:var(--orange)"><div class="valeur" style="color:var(--orange)">${totalListes}</div><div class="libelle">Listes</div></div>
-    <div class="stat" style="border-top-color:var(--cyan)"><div class="valeur" style="color:var(--cyan)">${totalContacts}</div><div class="libelle">Contacts total</div></div>
-    <div class="stat" style="border-top-color:var(--vert)"><div class="valeur" style="color:var(--vert)">${totalAAppeler}</div><div class="libelle">À appeler</div></div>
-    <div class="stat" style="border-top-color:var(--jaune)"><div class="valeur" style="color:var(--jaune)">${totalAutres}</div><div class="libelle">Appelés + en cours</div></div>
-  `;
-  document.getElementById('statsContactsNote').textContent =
-    'Le détail "appelés" vs "en cours" séparément nécessite une route Worker supplémentaire (non disponible actuellement) — voir la note à ce sujet.';
+  // La vue d'ensemble Contacts suit UNIQUEMENT la liste sélectionnée.
+  // Les compteurs proviennent directement de D1 via /api/listes.
+  rendreStatsContactsSelection();
+}
+
+function rendreStatsContactsSelection() {
+  const sel = document.getElementById('listeSelectView');
+  const id = sel ? String(sel.value || '') : '';
+  const liste = dernieresListes.find(l => String(l.id) === id);
+  const box = document.getElementById('statsContactsGlobal');
+  const note = document.getElementById('statsContactsNote');
+  const nomEl = document.getElementById('statsContactsListeNom');
+  const btnReset = document.getElementById('btnResetSuiviContacts');
+
+  if (!liste) {
+    if (box) box.innerHTML = `
+      <div class="stat"><div class="valeur">0</div><div class="libelle">Contacts total</div></div>
+      <div class="stat"><div class="valeur">0</div><div class="libelle">À appeler</div></div>
+      <div class="stat"><div class="valeur">0</div><div class="libelle">En cours</div></div>
+      <div class="stat"><div class="valeur">0</div><div class="libelle">Appelés</div></div>`;
+    if (nomEl) nomEl.textContent = '— sélectionne une liste —';
+    if (note) note.textContent = 'Les chiffres correspondent uniquement à la liste sélectionnée ci-dessous.';
+    if (btnReset) btnReset.disabled = true;
+    return;
+  }
+
+  const total = num(liste.nb_contacts);
+  const aAppeler = num(liste.nb_a_appeler);
+  const enCours = num(liste.nb_en_cours);
+  const appeles = num(liste.nb_appele);
+
+  if (box) box.innerHTML = `
+    <div class="stat" style="border-top-color:var(--cyan)"><div class="valeur" style="color:var(--cyan)">${total}</div><div class="libelle">Contacts total</div></div>
+    <div class="stat" style="border-top-color:var(--vert)"><div class="valeur" style="color:var(--vert)">${aAppeler}</div><div class="libelle">À appeler</div></div>
+    <div class="stat" style="border-top-color:var(--jaune)"><div class="valeur" style="color:var(--jaune)">${enCours}</div><div class="libelle">En cours</div></div>
+    <div class="stat" style="border-top-color:var(--orange)"><div class="valeur" style="color:var(--orange)">${appeles}</div><div class="libelle">Appelés</div></div>`;
+  if (nomEl) nomEl.textContent = `— ${liste.nom || 'Liste ' + liste.id} —`;
+  if (note) note.textContent = `${total} contact(s) dans cette liste : ${aAppeler} à appeler, ${enCours} en cours, ${appeles} appelé(s).`;
+  if (btnReset) btnReset.disabled = enCours > 0;
+}
+
+async function selectionnerListeContacts(id) {
+  rendreStatsContactsSelection();
+  await afficherContactsListe(id, 1);
+}
+
+async function remettreSuiviContactsAZero() {
+  const sel = document.getElementById('listeSelectView');
+  const id = sel ? String(sel.value || '') : '';
+  const liste = dernieresListes.find(l => String(l.id) === id);
+  if (!liste) return alert('Sélectionne d’abord une liste de contacts.');
+
+  const enCours = num(liste.nb_en_cours);
+  if (enCours > 0) {
+    return alert('Impossible de remettre le suivi à zéro : un contact de cette liste est en cours d’appel.');
+  }
+
+  const appeles = num(liste.nb_appele);
+  if (!confirm(
+    `Remettre le suivi de la liste "${liste.nom || liste.id}" à zéro ?\n\n` +
+    `${appeles} contact(s) déjà appelé(s) repasseront en "À appeler".\n` +
+    `Aucun contact et aucun historique d’appel ne seront supprimés.`
+  )) return;
+
+  try {
+    await apiFetch(`/api/listes/${id}/reset-suivi`, {
+      method: 'POST',
+      body: JSON.stringify({ confirmer: true })
+    });
+    await chargerListes();
+    document.getElementById('listeSelectView').value = id;
+    rendreStatsContactsSelection();
+    await afficherContactsListe(id, 1);
+    alert('Le suivi de cette liste a été remis à zéro.');
+  } catch (e) {
+    alert('Erreur : ' + e.message);
+  }
 }
 
 async function supprimerListe(id, nom) {
@@ -867,6 +933,7 @@ async function supprimerListe(id, nom) {
 async function afficherContactsListe(id, page) {
   if (!id) { document.getElementById('contactsBody').innerHTML = '<tr><td colspan="7" class="hint">Sélectionne une liste.</td></tr>'; document.getElementById('contactsPagination').innerHTML=''; return; }
   document.getElementById('listeSelectView').value = id;
+  rendreStatsContactsSelection();
   contactsPageCourante = page || 1;
   const corps = document.getElementById('contactsBody');
   corps.innerHTML = '<tr><td colspan="7" class="hint">Chargement…</td></tr>';
