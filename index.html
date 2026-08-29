@@ -390,12 +390,12 @@
     <div class="panel c-vert">
       <h2>Vue d'ensemble (toutes campagnes) <small>Mode message unique — métriques complètes</small></h2>
       <div class="stats-grid" id="statsGlobales"></div>
-      <button class="danger" onclick="remettreToutesMetriquesAZero()" style="margin-top:12px;">Remettre toutes les métriques à zéro</button>
     </div>
     <div class="panel c-vert">
       <h2>Par campagne</h2>
       <select id="dashboardCampagneSelect" onchange="chargerStatsCampagne()"></select>
       <div class="stats-grid" id="statsCampagne" style="margin-top:10px;"></div>
+      <button class="danger" onclick="remettreMetriquesCampagneBoardAZero()" style="margin-top:12px;">Remettre toutes les métriques de cette campagne à zéro</button>
     </div>
   </section>
 
@@ -1413,6 +1413,34 @@ async function chargerStatsRapport() {
   }
 }
 
+
+async function remettreMetriquesCampagneBoardAZero() {
+  const sel = document.getElementById('dashboardCampagneSelect');
+  const id = sel ? String(sel.value || '') : '';
+  if (!id) return alert('Sélectionne d’abord une campagne dans Board.');
+
+  const nom = sel.options[sel.selectedIndex]?.textContent || `Campagne ${id}`;
+  const ok = confirm(
+    `Remettre TOUTES les métriques de « ${nom} » à zéro ?\n\n` +
+    'Seule cette campagne sera remise à zéro. Les autres campagnes ne seront pas modifiées.\n' +
+    'L’historique des appels, les contacts et la campagne seront conservés.'
+  );
+  if (!ok) return;
+
+  try {
+    await apiFetch(`/api/campagnes/${id}/metrics/reset`, {
+      method: 'POST',
+      body: JSON.stringify({ confirmer: true })
+    });
+    await chargerStatsCampagne();
+    if (String(document.getElementById('rapportsCampagneSelect')?.value || '') === id) {
+      await chargerStatsRapport();
+    }
+    alert(`Toutes les métriques de « ${nom} » ont été remises à zéro. Les autres campagnes sont inchangées.`);
+  } catch (e) {
+    alert('Erreur : ' + e.message);
+  }
+}
 
 async function remettreToutesMetriquesAZero() {
   const ok = confirm(
