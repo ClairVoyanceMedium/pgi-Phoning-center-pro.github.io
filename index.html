@@ -329,6 +329,11 @@
         <button class="small danger" style="margin:0;" id="btnSupprimerTousContacts" onclick="supprimerTousContactsListe()">Supprimer tous les contacts</button>
         <button class="small danger" style="margin:0;" id="btnSupprimerListeSelectionnee" onclick="supprimerListeSelectionnee()">Supprimer la liste</button>
       </div>
+      <div class="row" style="margin-top:8px;align-items:center;">
+        <input id="rechercheContact" style="margin:0;flex:1;" placeholder="Rechercher un numéro dans toute la liste (ex : 06… ou +336…)" onkeydown="if(event.key==='Enter'){event.preventDefault();rechercherContactListe();}" />
+        <button class="orange small" style="margin:0;" onclick="rechercherContactListe()">Rechercher</button>
+        <button class="secondaire small" style="margin:0;" onclick="effacerRechercheContactListe()">Effacer</button>
+      </div>
       <div class="table-scroll">
         <table style="margin-top:10px;">
           <thead><tr><th>Téléphone</th><th>Prénom</th><th>Nom</th><th>Pays</th><th>Langue</th><th>Statut</th><th>Action</th></tr></thead>
@@ -973,6 +978,19 @@ async function supprimerListe(id, nom) {
   }
 }
 
+function rechercherContactListe() {
+  const id = document.getElementById('listeSelectView')?.value || '';
+  if (!id) return alert('Sélectionne d’abord une liste.');
+  afficherContactsListe(id, 1);
+}
+
+function effacerRechercheContactListe() {
+  const input = document.getElementById('rechercheContact');
+  if (input) input.value = '';
+  const id = document.getElementById('listeSelectView')?.value || '';
+  if (id) afficherContactsListe(id, 1);
+}
+
 async function afficherContactsListe(id, page) {
   if (!id) { document.getElementById('contactsBody').innerHTML = '<tr><td colspan="7" class="hint">Sélectionne une liste.</td></tr>'; document.getElementById('contactsPagination').innerHTML=''; return; }
   document.getElementById('listeSelectView').value = id;
@@ -981,13 +999,19 @@ async function afficherContactsListe(id, page) {
   const corps = document.getElementById('contactsBody');
   corps.innerHTML = '<tr><td colspan="7" class="hint">Chargement…</td></tr>';
   try {
-    const reponse = await apiFetch(`/api/listes/${id}?page=${contactsPageCourante}&limite=${CONTACTS_PAR_PAGE}`);
+    const recherche = (document.getElementById('rechercheContact')?.value || '').trim();
+    const qsRecherche = recherche ? `&recherche=${encodeURIComponent(recherche)}` : '';
+    const reponse = await apiFetch(`/api/listes/${id}?page=${contactsPageCourante}&limite=${CONTACTS_PAR_PAGE}${qsRecherche}`);
     let contacts = normaliserListe(reponse, ['results', 'contacts']);
     const total  = (reponse && typeof reponse === 'object' && 'total' in reponse) ? num(reponse.total) : contacts.length;
     const limite = (reponse && typeof reponse === 'object' && 'limite' in reponse) ? num(reponse.limite, CONTACTS_PAR_PAGE) : CONTACTS_PAR_PAGE;
 
     const filtre = document.getElementById('filtreStatutContact').value;
     if (filtre) contacts = contacts.filter(c => c.statut === filtre);
+
+    const messageAucun = recherche
+      ? `Aucun numéro correspondant à « ${echapperHtml(recherche)} » dans cette liste.`
+      : (filtre ? 'Aucun contact trouvé pour ce filtre.' : 'Aucun contact trouvé dans cette liste — vérifie qu\'un import a bien été effectué.');
 
     corps.innerHTML = contacts.length ? contacts.map(c => `
       <tr>
@@ -998,7 +1022,7 @@ async function afficherContactsListe(id, page) {
         <td>${echapperHtml(c.langue || '—')}</td>
         <td><span class="badge ${c.statut}">${echapperHtml(c.statut || '—')}</span></td>
         <td><button class="small danger" style="margin:0;" onclick="supprimerContact(${c.id}, ${id}, '${String(c.phone || '').replace(/'/g, "\\'")}')">Supprimer</button></td>
-      </tr>`).join('') : '<tr><td colspan="7" class="hint">Aucun contact trouvé' + (filtre ? ' pour ce filtre.' : ' dans cette liste — vérifie qu\'un import a bien été effectué.') + '</td></tr>';
+      </tr>`).join('') : `<tr><td colspan="7" class="hint">${messageAucun}</td></tr>`;
 
     const totalPages = Math.max(1, Math.ceil(total / limite));
     document.getElementById('contactsPagination').innerHTML = total > limite ? `
