@@ -321,8 +321,8 @@
       </div>
       <div class="table-scroll">
         <table style="margin-top:10px;">
-          <thead><tr><th>Téléphone</th><th>Prénom</th><th>Nom</th><th>Pays</th><th>Langue</th><th>Statut</th></tr></thead>
-          <tbody id="contactsBody"><tr><td colspan="6" class="hint">Sélectionne une liste ci-dessus.</td></tr></tbody>
+          <thead><tr><th>Téléphone</th><th>Prénom</th><th>Nom</th><th>Pays</th><th>Langue</th><th>Statut</th><th>Action</th></tr></thead>
+          <tbody id="contactsBody"><tr><td colspan="7" class="hint">Sélectionne une liste ci-dessus.</td></tr></tbody>
         </table>
       </div>
       <div class="pagination" id="contactsPagination"></div>
@@ -344,6 +344,7 @@
         <button class="secondaire" onclick="chargerAppels(); chargerStatsRapport();">🔄 Rafraîchir</button>
         <button class="vert" onclick="exporterCsv()">⬇ Exporter CSV</button>
         <button class="orange" onclick="nettoyerBlockes()">🧹 Nettoyer bloqués</button>
+        <button class="danger" onclick="remettreToutesMetriquesAZero()">Remettre toutes les métriques à zéro</button>
       </div>
       <div class="row" style="margin-top:8px;">
         <select id="filtreStatutAppel" onchange="rendreAppels()">
@@ -379,6 +380,7 @@
     <div class="panel c-vert">
       <h2>Vue d'ensemble (toutes campagnes) <small>Mode message unique — métriques complètes</small></h2>
       <div class="stats-grid" id="statsGlobales"></div>
+      <button class="danger" onclick="remettreToutesMetriquesAZero()" style="margin-top:12px;">Remettre toutes les métriques à zéro</button>
     </div>
     <div class="panel c-vert">
       <h2>Par campagne</h2>
@@ -863,11 +865,11 @@ async function supprimerListe(id, nom) {
 }
 
 async function afficherContactsListe(id, page) {
-  if (!id) { document.getElementById('contactsBody').innerHTML = '<tr><td colspan="6" class="hint">Sélectionne une liste.</td></tr>'; document.getElementById('contactsPagination').innerHTML=''; return; }
+  if (!id) { document.getElementById('contactsBody').innerHTML = '<tr><td colspan="7" class="hint">Sélectionne une liste.</td></tr>'; document.getElementById('contactsPagination').innerHTML=''; return; }
   document.getElementById('listeSelectView').value = id;
   contactsPageCourante = page || 1;
   const corps = document.getElementById('contactsBody');
-  corps.innerHTML = '<tr><td colspan="6" class="hint">Chargement…</td></tr>';
+  corps.innerHTML = '<tr><td colspan="7" class="hint">Chargement…</td></tr>';
   try {
     const reponse = await apiFetch(`/api/listes/${id}?page=${contactsPageCourante}&limite=${CONTACTS_PAR_PAGE}`);
     let contacts = normaliserListe(reponse, ['results', 'contacts']);
@@ -885,7 +887,8 @@ async function afficherContactsListe(id, page) {
         <td>${echapperHtml(c.pays || '—')}</td>
         <td>${echapperHtml(c.langue || '—')}</td>
         <td><span class="badge ${c.statut}">${echapperHtml(c.statut || '—')}</span></td>
-      </tr>`).join('') : '<tr><td colspan="6" class="hint">Aucun contact trouvé' + (filtre ? ' pour ce filtre.' : ' dans cette liste — vérifie qu\'un import a bien été effectué.') + '</td></tr>';
+        <td><button class="small danger" style="margin:0;" onclick="supprimerContact(${c.id}, ${id}, '${String(c.phone || '').replace(/'/g, "\\'")}')">Supprimer</button></td>
+      </tr>`).join('') : '<tr><td colspan="7" class="hint">Aucun contact trouvé' + (filtre ? ' pour ce filtre.' : ' dans cette liste — vérifie qu\'un import a bien été effectué.') + '</td></tr>';
 
     const totalPages = Math.max(1, Math.ceil(total / limite));
     document.getElementById('contactsPagination').innerHTML = total > limite ? `
@@ -894,8 +897,21 @@ async function afficherContactsListe(id, page) {
       <button class="small secondaire" ${contactsPageCourante>=totalPages?'disabled':''} onclick="afficherContactsListe(${id}, ${contactsPageCourante+1})">Suivant →</button>
     ` : `<span>${total} contact(s) au total</span>`;
   } catch (e) {
-    corps.innerHTML = `<tr><td colspan="6"><div class="erreur-msg">Erreur de chargement : ${echapperHtml(e.message)}</div></td></tr>`;
+    corps.innerHTML = `<tr><td colspan="7"><div class="erreur-msg">Erreur de chargement : ${echapperHtml(e.message)}</div></td></tr>`;
     document.getElementById('contactsPagination').innerHTML = '';
+  }
+}
+
+async function supprimerContact(contactId, listeId, phone) {
+  const libelle = phone ? ` ${phone}` : '';
+  if (!confirm(`Supprimer définitivement le contact${libelle} de cette liste ?\n\nSon ancien historique d'appels sera conservé.`)) return;
+
+  try {
+    await apiFetch(`/api/contacts/${contactId}`, { method: 'DELETE' });
+    await chargerListes();
+    await afficherContactsListe(listeId, contactsPageCourante);
+  } catch (e) {
+    alert('Erreur : ' + e.message);
   }
 }
 
@@ -1271,6 +1287,31 @@ async function chargerStatsRapport() {
     rendreStats('statsRapport', s);
   } catch (e) {
     document.getElementById('statsRapport').innerHTML = `<div class="erreur-msg">Erreur : ${echapperHtml(e.message)}</div>`;
+  }
+}
+
+
+async function remettreToutesMetriquesAZero() {
+  const ok = confirm(
+    'Remettre TOUTES les métriques à zéro ?\n\n' +
+    'Le Board global, les statistiques par campagne et les métriques Rapports repartiront de 0.\n' +
+    'L’historique des appels, les contacts et les campagnes seront conservés.'
+  );
+  if (!ok) return;
+
+  try {
+    await apiFetch('/api/stats/reset-all', {
+      method: 'POST',
+      body: JSON.stringify({ confirmer: true })
+    });
+
+    await chargerDashboard();
+    if (document.getElementById('rapportsCampagneSelect').value) {
+      await chargerStatsRapport();
+    }
+    alert('Toutes les métriques ont été remises à zéro.');
+  } catch (e) {
+    alert('Erreur : ' + e.message);
   }
 }
 
