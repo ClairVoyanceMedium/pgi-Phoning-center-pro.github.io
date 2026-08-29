@@ -840,6 +840,7 @@ async function chargerListes() {
       <span class="hint">${num(l.nb_contacts)} contact(s) · ${num(l.nb_a_appeler)} à appeler</span>
       <div class="liste-actions">
         <button class="small" onclick="afficherContactsListe(${l.id}, 1)">👁 Voir contacts</button>
+        <button class="small secondaire" onclick="renommerListe(${l.id})">✎ Renommer</button>
         <button class="small danger" onclick="supprimerListe(${l.id}, '${(l.nom||'').replace(/'/g,"\\'")}')">🗑 Supprimer</button>
       </div>
     </div>`).join('') || '<p class="hint">Aucune liste. Crée-en une ci-dessus.</p>';
@@ -853,6 +854,27 @@ async function chargerListes() {
   // La vue d'ensemble Contacts suit UNIQUEMENT la liste sélectionnée.
   // Les compteurs proviennent directement de D1 via /api/listes.
   rendreStatsContactsSelection();
+}
+
+async function renommerListe(id) {
+  const liste = dernieresListes.find(l => String(l.id) === String(id));
+  if (!liste) return alert('Liste introuvable.');
+
+  const nouveauNomSaisi = prompt('Nouveau nom de la liste :', liste.nom || '');
+  if (nouveauNomSaisi === null) return;
+  const nouveauNom = nouveauNomSaisi.trim();
+  if (!nouveauNom) return alert('Le nom de la liste ne peut pas être vide.');
+  if (nouveauNom === String(liste.nom || '').trim()) return;
+
+  try {
+    await apiFetch(`/api/listes/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ nom: nouveauNom })
+    });
+    await chargerListes();
+  } catch (e) {
+    alert('Erreur : ' + e.message);
+  }
 }
 
 function rendreStatsContactsSelection() {
@@ -1743,8 +1765,8 @@ async function chargerLiens() {
       </a>
       <span class="lien-domaine">${echapperHtml(extraireDomaine(l.url))}</span>
       <div class="lien-actions">
-        <button class="small secondaire" onclick="toggleEditLien(${l.id})">✎</button>
-        <button class="small danger" onclick="supprimerLien(${l.id})">✕</button>
+        <button class="small secondaire" onclick="toggleEditLien(${l.id})">✎ Modifier</button>
+        <button class="small danger" onclick="supprimerLien(${l.id}, '${(l.libelle||extraireDomaine(l.url)||'Lien').replace(/'/g,"\\'")}')">🗑 Supprimer</button>
       </div>
     </div>
     <div class="lien-edit-form" id="lien-form-${l.id}">
@@ -1772,9 +1794,14 @@ async function enregistrerLien(id) {
   } catch(e) { alert('Erreur : '+e.message); }
 }
 
-async function supprimerLien(id) {
-  try { await apiFetch(`/api/liens/${id}`, { method:'DELETE' }); chargerLiens(); }
-  catch(e) { alert('Erreur : '+e.message); }
+async function supprimerLien(id, libelle) {
+  if (!confirm(`Supprimer définitivement le lien "${libelle || 'Lien'}" ?`)) return;
+  try {
+    await apiFetch(`/api/liens/${id}`, { method:'DELETE' });
+    await chargerLiens();
+  } catch(e) {
+    alert('Erreur : ' + e.message);
+  }
 }
 </script>
 </body>
