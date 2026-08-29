@@ -382,6 +382,10 @@
         </table>
       </div>
       <p class="hint" id="appelsCompteur"></p>
+      <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--bordure);">
+        <button class="danger" onclick="remettreRapportsCampagneAZero()">Remettre les rapports de cette campagne à zéro</button>
+        <p class="hint" style="margin-top:8px;">Vide le tableau détaillé et l’export CSV de la campagne sélectionnée (date/heure, téléphone, pays, langue, statut, type de message, tours, durée, etc.). Les métriques, contacts et autres campagnes ne sont pas modifiés.</p>
+      </div>
     </div>
   </section>
 
@@ -1559,6 +1563,32 @@ async function nettoyerBlockes() {
     await chargerStatsRapport();
     await chargerDashboard();
   } catch (e) { alert('Erreur : ' + e.message); }
+}
+
+async function remettreRapportsCampagneAZero() {
+  const sel = document.getElementById('rapportsCampagneSelect');
+  const id = sel ? String(sel.value || '') : '';
+  if (!id) return alert('Sélectionne d’abord une campagne dans Rapports.');
+
+  const nom = sel.options[sel.selectedIndex]?.textContent || `Campagne ${id}`;
+  const ok = confirm(
+    `Remettre les RAPPORTS de « ${nom} » à zéro ?\n\n` +
+    'Le tableau détaillé et l’export CSV de cette campagne repartiront de zéro.\n' +
+    'Les métriques, contacts, campagne et autres campagnes ne seront pas modifiés.'
+  );
+  if (!ok) return;
+
+  try {
+    await apiFetch(`/api/campagnes/${id}/reports/reset`, {
+      method: 'POST',
+      body: JSON.stringify({ confirmer: true })
+    });
+    derniersAppels = [];
+    await chargerAppels();
+    alert(`Les rapports de « ${nom} » ont été remis à zéro. Les prochains appels apparaîtront normalement.`);
+  } catch (e) {
+    alert('Erreur : ' + e.message);
+  }
 }
 
 function exporterCsv() {
